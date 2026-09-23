@@ -1,7 +1,7 @@
 OpenWebRX+ (русская сборка)
 =========
 
-Форк [OpenWebRX+](https://github.com/luarvique/openwebrx) с добавленной русской локализацией интерфейса и несколькими дополнительными функциями. Репозиторий: https://github.com/Sergey125/openwebrx-masterRU
+Форк [OpenWebRX+](https://github.com/luarvique/openwebrx) с добавленной русской локализацией интерфейса и несколькими дополнительными функциями. Репозиторий: https://github.com/Sergey125/openwebrx-RU
 
 ## Что добавлено в этом форке
 

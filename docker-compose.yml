@@ -1,6 +1,6 @@
 services:
   openwebrx:
-    image: ghcr.io/sergey125/openwebrx-masterru:latest
+    image: ghcr.io/sergey125/openwebrx-ru:latest
     pull_policy: always
     container_name: openwebrx
     restart: unless-stopped
