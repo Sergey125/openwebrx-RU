@@ -14,7 +14,47 @@ OpenWebRX+ (русская сборка)
 * **Уведомление о запуске приёмника** — если данные с SDR не идут дольше нескольких секунд после подключения, показывается уведомление «приёмник запускается».
 * **Скрытие ссылки на вход в администрирование** — опционально прячет ссылку на `/settings` с главной страницы.
 
-Разворачивается как обычный Docker-стек — см. [Dockerfile](Dockerfile) и [docker-compose.yml](docker-compose.yml) (например, через [Dockge](https://github.com/louislam/dockge)).
+Разворачивается как обычный Docker-стек — см. [Dockerfile](Dockerfile) и [docker-compose.yml](docker-compose.yml) (например, через [Dockge](https://github.com/louislam/dockge)). Образ собирается поверх официального [slechev/openwebrxplus-softmbe](https://hub.docker.com/r/slechev/openwebrxplus-softmbe) — наши изменения накладываются как патч ([patches/ru-localization.patch](patches/ru-localization.patch)), а не подменяют файлы целиком, поэтому обновления апстрима продолжают подхватываться автоматически (сборка идёт ежедневно по расписанию, см. [.github/workflows/docker-build.yml](.github/workflows/docker-build.yml)). Если апстрим настолько поменяет один из затронутых файлов, что патч перестанет накладываться, сборка упадёт с понятной ошибкой вместо того, чтобы молча затереть их изменения.
+
+### Как обновить патч после правки исходников
+
+Если меняете `htdocs/index.html`, `htdocs/include/header.include.html`, `owrx/config/defaults.py`, `owrx/controllers/settings/general.py`, `owrx/controllers/template.py`, `owrx/version.py` или `owrx/feature.py` — патч нужно перегенерировать:
+
+```bash
+# 1. Вытащить оригиналы (какими они сейчас есть в свежем базовом образе)
+docker pull slechev/openwebrxplus-softmbe:latest
+mkdir -p /tmp/orig
+for f in htdocs/index.html htdocs/include/header.include.html owrx/config/defaults.py \
+         owrx/controllers/settings/general.py owrx/controllers/template.py \
+         owrx/version.py owrx/feature.py; do
+  docker run --rm --entrypoint cat slechev/openwebrxplus-softmbe:latest \
+    "/usr/lib/python3/dist-packages/$f" > "/tmp/orig/$(basename "$f")"
+done
+
+# 2. Собрать диффы в один патч (a/ = оригинал, b/ = наша версия из репозитория)
+rm -rf /tmp/pdiff && mkdir -p /tmp/pdiff
+python3 - <<'PY'
+import os, shutil
+files = {
+  "index.html": "htdocs/index.html",
+  "header.include.html": "htdocs/include/header.include.html",
+  "defaults.py": "owrx/config/defaults.py",
+  "general.py": "owrx/controllers/settings/general.py",
+  "template.py": "owrx/controllers/template.py",
+  "version.py": "owrx/version.py",
+  "feature.py": "owrx/feature.py",
+}
+for key, rel in files.items():
+    for side, src in (("a", f"/tmp/orig/{key}"), ("b", rel)):
+        dst = f"/tmp/pdiff/{side}/{rel}"
+        os.makedirs(os.path.dirname(dst), exist_ok=True)
+        shutil.copy(src, dst)
+PY
+cd /tmp/pdiff && diff -ruN a b > "$OLDPWD/patches/ru-localization.patch"
+cd "$OLDPWD"
+```
+
+Затем `docker build` локально, чтобы убедиться, что патч применяется чисто, и закоммитить обновлённый `patches/ru-localization.patch`.
 
 ---
 
