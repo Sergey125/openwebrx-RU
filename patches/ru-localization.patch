@@ -1,6 +1,6 @@
 diff --color -ruN a/htdocs/include/header.include.html b/htdocs/include/header.include.html
---- a/htdocs/include/header.include.html	2026-09-23 14:08:18.891694583 +0500
-+++ b/htdocs/include/header.include.html	2026-09-23 14:08:18.891916434 +0500
+--- a/htdocs/include/header.include.html	2026-09-23 14:18:51.626728995 +0500
++++ b/htdocs/include/header.include.html	2026-09-23 14:18:51.626801178 +0500
 @@ -1,3 +1,72 @@
 +        <style>
 +html.ru-hide-settings a[target="openwebrx-settings"] { display: none !important; }
@@ -1048,8 +1048,8 @@ diff --color -ruN a/htdocs/include/header.include.html b/htdocs/include/header.i
 +})();
 +    </script>
 diff --color -ruN a/htdocs/index.html b/htdocs/index.html
---- a/htdocs/index.html	2026-09-23 14:08:18.890061778 +0500
-+++ b/htdocs/index.html	2026-09-23 14:08:18.890944897 +0500
+--- a/htdocs/index.html	2026-09-23 14:18:51.626395692 +0500
++++ b/htdocs/index.html	2026-09-23 14:18:51.626531578 +0500
 @@ -41,8 +41,7 @@
          <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9, minimum-scale=0.9, shrink-to-fit=no, user-scalable=no, interactive-widget=overlays-content" />
          <meta name="theme-color" content="#222" />
@@ -1061,8 +1061,8 @@ diff --color -ruN a/htdocs/index.html b/htdocs/index.html
  
  <div id="webrx-page-container" onmousemove="UI.bumpOpacity();" onmousedown="UI.bumpOpacity();">
 diff --color -ruN a/owrx/config/defaults.py b/owrx/config/defaults.py
---- a/owrx/config/defaults.py	2026-09-23 14:08:18.892296191 +0500
-+++ b/owrx/config/defaults.py	2026-09-23 14:08:18.892450801 +0500
+--- a/owrx/config/defaults.py	2026-09-23 14:18:51.627090909 +0500
++++ b/owrx/config/defaults.py	2026-09-23 14:18:51.627195619 +0500
 @@ -486,5 +486,12 @@
      meshcom_bw="8",
      speech_url="",
@@ -1078,8 +1078,8 @@ diff --color -ruN a/owrx/config/defaults.py b/owrx/config/defaults.py
 +    ru_hide_settings_link=False
  ).readonly()
 diff --color -ruN a/owrx/controllers/settings/general.py b/owrx/controllers/settings/general.py
---- a/owrx/controllers/settings/general.py	2026-09-23 14:08:18.892775204 +0500
-+++ b/owrx/controllers/settings/general.py	2026-09-23 14:08:18.892965495 +0500
+--- a/owrx/controllers/settings/general.py	2026-09-23 14:18:51.627395830 +0500
++++ b/owrx/controllers/settings/general.py	2026-09-23 14:18:51.627469674 +0500
 @@ -376,6 +376,39 @@
                  ),
              ),
@@ -1121,8 +1121,8 @@ diff --color -ruN a/owrx/controllers/settings/general.py b/owrx/controllers/sett
                  PasswordInput(
                      "admin_pass_0",
 diff --color -ruN a/owrx/controllers/template.py b/owrx/controllers/template.py
---- a/owrx/controllers/template.py	2026-09-23 14:08:18.893350842 +0500
-+++ b/owrx/controllers/template.py	2026-09-23 14:08:18.893596181 +0500
+--- a/owrx/controllers/template.py	2026-09-23 14:18:51.627563694 +0500
++++ b/owrx/controllers/template.py	2026-09-23 14:18:51.627630149 +0500
 @@ -3,6 +3,7 @@
  from owrx.config import Config
  from string import Template
@@ -1150,94 +1150,3 @@ diff --color -ruN a/owrx/controllers/template.py b/owrx/controllers/template.py
          return variables
  
      def template_variables(self):
-diff --color -ruN a/owrx/feature.py b/owrx/feature.py
---- a/owrx/feature.py	2026-09-23 14:08:18.894088817 +0500
-+++ b/owrx/feature.py	2026-09-23 14:08:18.894257097 +0500
-@@ -2,7 +2,7 @@
- from functools import reduce
- from operator import and_
- import re
--from distutils.version import LooseVersion, StrictVersion
-+from owrx.version import LooseVersion, StrictVersion
- import inspect
- from owrx.config.core import CoreConfig
- from owrx.config import Config
-diff --color -ruN a/owrx/version.py b/owrx/version.py
---- a/owrx/version.py	2026-09-23 14:08:18.893817205 +0500
-+++ b/owrx/version.py	2026-09-23 14:08:18.893940851 +0500
-@@ -1,4 +1,74 @@
--from distutils.version import LooseVersion
-+import re
-+
-+
-+class LooseVersion:
-+    """
-+    Minimal drop-in replacement for distutils.version.LooseVersion,
-+    which was removed from the standard library in Python 3.12.
-+    """
-+
-+    _component_re = re.compile(r"(\d+|[a-zA-Z]+|\.)")
-+
-+    def __init__(self, vstring):
-+        self.vstring = vstring
-+        self.version = self._parse(vstring)
-+
-+    def _parse(self, vstring):
-+        components = [c for c in self._component_re.split(vstring) if c and c != "."]
-+        parts = []
-+        for c in components:
-+            try:
-+                parts.append(int(c))
-+            except ValueError:
-+                parts.append(c)
-+        return parts
-+
-+    def __str__(self):
-+        return self.vstring
-+
-+    def __repr__(self):
-+        return "LooseVersion('{0}')".format(self.vstring)
-+
-+    def _compare(self, other):
-+        if isinstance(other, str):
-+            other = LooseVersion(other)
-+        a, b = self.version, other.version
-+        length = max(len(a), len(b))
-+        a = a + [0] * (length - len(a))
-+        b = b + [0] * (length - len(b))
-+        for x, y in zip(a, b):
-+            if type(x) is not type(y):
-+                x, y = str(x), str(y)
-+            if x < y:
-+                return -1
-+            if x > y:
-+                return 1
-+        return 0
-+
-+    def __eq__(self, other):
-+        return self._compare(other) == 0
-+
-+    def __ne__(self, other):
-+        return self._compare(other) != 0
-+
-+    def __lt__(self, other):
-+        return self._compare(other) < 0
-+
-+    def __le__(self, other):
-+        return self._compare(other) <= 0
-+
-+    def __gt__(self, other):
-+        return self._compare(other) > 0
-+
-+    def __ge__(self, other):
-+        return self._compare(other) >= 0
-+
-+
-+# StrictVersion enforces an X.Y.Z-ish format in distutils; for our purposes
-+# (simple >= comparisons against reported tool/library versions) the looser
-+# parser behaves the same, so we reuse it here as well.
-+StrictVersion = LooseVersion
-+
- 
- _versionstring = "1.2.124"
- looseversion = LooseVersion(_versionstring)

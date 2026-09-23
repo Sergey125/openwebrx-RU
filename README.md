@@ -18,15 +18,14 @@ OpenWebRX+ (русская сборка)
 
 ### Как обновить патч после правки исходников
 
-Если меняете `htdocs/index.html`, `htdocs/include/header.include.html`, `owrx/config/defaults.py`, `owrx/controllers/settings/general.py`, `owrx/controllers/template.py`, `owrx/version.py` или `owrx/feature.py` — патч нужно перегенерировать:
+Если меняете `htdocs/index.html`, `htdocs/include/header.include.html`, `owrx/config/defaults.py`, `owrx/controllers/settings/general.py` или `owrx/controllers/template.py` — патч нужно перегенерировать:
 
 ```bash
 # 1. Вытащить оригиналы (какими они сейчас есть в свежем базовом образе)
 docker pull slechev/openwebrxplus-softmbe:latest
 mkdir -p /tmp/orig
 for f in htdocs/index.html htdocs/include/header.include.html owrx/config/defaults.py \
-         owrx/controllers/settings/general.py owrx/controllers/template.py \
-         owrx/version.py owrx/feature.py; do
+         owrx/controllers/settings/general.py owrx/controllers/template.py; do
   docker run --rm --entrypoint cat slechev/openwebrxplus-softmbe:latest \
     "/usr/lib/python3/dist-packages/$f" > "/tmp/orig/$(basename "$f")"
 done
@@ -41,8 +40,6 @@ files = {
   "defaults.py": "owrx/config/defaults.py",
   "general.py": "owrx/controllers/settings/general.py",
   "template.py": "owrx/controllers/template.py",
-  "version.py": "owrx/version.py",
-  "feature.py": "owrx/feature.py",
 }
 for key, rel in files.items():
     for side, src in (("a", f"/tmp/orig/{key}"), ("b", rel)):
