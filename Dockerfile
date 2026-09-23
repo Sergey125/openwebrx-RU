@@ -9,6 +9,19 @@
 FROM debian:bullseye-slim AS base
 ARG MAKEFLAGS
 
+# Debian bullseye has reached end-of-life and moved off the regular mirrors
+# (deb.debian.org / security.debian.org) to archive.debian.org. Repoint apt
+# there and disable the Release-file expiry check, since archived Release
+# files are intentionally frozen and will otherwise be rejected as "expired".
+RUN set -eux; \
+    { \
+      echo 'deb http://archive.debian.org/debian bullseye main'; \
+      echo 'deb http://archive.debian.org/debian-security bullseye-security main'; \
+      echo 'deb http://archive.debian.org/debian bullseye-updates main'; \
+    } > /etc/apt/sources.list; \
+    rm -f /etc/apt/sources.list.d/*.list; \
+    printf 'Acquire::Check-Valid-Until "false";\n' > /etc/apt/apt.conf.d/99no-check-valid-until
+
 COPY docker/files/js8call/js8call-hamlib.patch \
      docker/files/wsjtx/wsjtx.patch \
      docker/files/wsjtx/wsjtx-hamlib.patch \
