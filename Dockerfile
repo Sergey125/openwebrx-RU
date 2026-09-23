@@ -11,6 +11,7 @@ FROM slechev/openwebrxplus-softmbe:latest
 
 # Paths as installed by the "openwebrx" .deb package inside that image.
 COPY htdocs/index.html /usr/lib/python3/dist-packages/htdocs/index.html
+COPY htdocs/include/header.include.html /usr/lib/python3/dist-packages/htdocs/include/header.include.html
 COPY owrx/config/defaults.py /usr/lib/python3/dist-packages/owrx/config/defaults.py
 COPY owrx/controllers/settings/general.py /usr/lib/python3/dist-packages/owrx/controllers/settings/general.py
 COPY owrx/controllers/template.py /usr/lib/python3/dist-packages/owrx/controllers/template.py

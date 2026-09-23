@@ -29,19 +29,6 @@ class WebpageController(TemplateController):
     def header_variables(self):
         variables = { "document_root": self.get_document_root(), "map_type": "" }
         variables.update(ReceiverDetails().__dict__())
-        return variables
-
-    def template_variables(self):
-        header = self.render_template("include/header.include.html", **self.header_variables())
-        return {"header": header, "document_root": self.get_document_root()}
-
-
-class IndexController(WebpageController):
-    def indexAction(self):
-        self.serve_template("index.html", **self.template_variables())
-
-    def template_variables(self):
-        variables = super().template_variables()
         pm = Config.get()
         ru_features = {
             "translateEnabled": bool(pm["ru_translate_enabled"]),
@@ -55,6 +42,15 @@ class IndexController(WebpageController):
         # prevent breaking out of the surrounding <script> tag
         variables["ruFeaturesConfig"] = json.dumps(ru_features).replace("</", "<\\/")
         return variables
+
+    def template_variables(self):
+        header = self.render_template("include/header.include.html", **self.header_variables())
+        return {"header": header, "document_root": self.get_document_root()}
+
+
+class IndexController(WebpageController):
+    def indexAction(self):
+        self.serve_template("index.html", **self.template_variables())
 
 
 class MapController(WebpageController):
