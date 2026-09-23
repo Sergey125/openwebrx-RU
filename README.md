@@ -1,5 +1,24 @@
-OpenWebRX+
+OpenWebRX+ (русская сборка)
 =========
+
+Форк [OpenWebRX+](https://github.com/luarvique/openwebrx) с добавленной русской локализацией интерфейса и несколькими дополнительными функциями. Репозиторий: https://github.com/Sergey125/openwebrx-masterRU
+
+## Что добавлено в этом форке
+
+Все функции включаются и настраиваются на странице `Settings → General → Custom Russian UI features` — без правки конфигурационных файлов вручную.
+
+* **Перевод интерфейса на русский** — переводятся подписи меню, кнопки, подсказки на главной странице приёмника и (отдельным, более полным словарём) на странице администрирования `/settings`. Значения полей (введённые данные, URL, позывные, пароли) не переводятся — затрагивается только видимый текст интерфейса.
+* **Переключатель языка RU/EN** — кнопка на странице позволяет посетителю переключаться между русским и английским, выбор запоминается в браузере.
+* **Кнопка «Сообщить о проблеме»** — плавающая кнопка, отправляющая отчёт (что не работает, комментарий, текущая частота и профиль) на заданный вебхук.
+* **Голосование слушателей перед сменой профиля SDR** — если приёмник слушают несколько человек одновременно, смена профиля запрашивает подтверждение у остальных слушателей через заданный вебхук.
+* **Уведомление о запуске приёмника** — если данные с SDR не идут дольше нескольких секунд после подключения, показывается уведомление «приёмник запускается».
+* **Скрытие ссылки на вход в администрирование** — опционально прячет ссылку на `/settings` с главной страницы.
+
+Разворачивается как обычный Docker-стек — см. [Dockerfile](Dockerfile) и [docker-compose.yml](docker-compose.yml) (например, через [Dockge](https://github.com/louislam/dockge)).
+
+---
+
+Ниже — исходное описание проекта OpenWebRX+.
 
 This is the **improved version** of the OpenWebRX online SDR. The pre-built OpenWebRX+ packages are available from the [package repository](https://luarvique.github.io/ppa/). Pre-built disk images are available from the [Releases page](https://github.com/luarvique/openwebrx/releases). OpenWebRX+ [documentation](https://fms.komkon.org/OWRX/) draft is now available. News, support, and general discussion can be found in the [Telegram channel](https://t.me/openwebrx) and related [chat](https://t.me/openwebrx_chat). Features found in OpenWebRX+ that are not present in the original version:
 * AIS, SSTV, FAX, FLEX, POCSAG, HFDL, VDL2, ADSB, ACARS, ISM, RDS, SAM, SITOR-B, RTTY, and CW decoders.
