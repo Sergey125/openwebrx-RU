@@ -20,9 +20,30 @@ function cmakebuild() {
 
 cd /tmp
 
+# Debian bullseye's security suite (bullseye-security) has been decommissioned
+# from the mirror network now that bullseye is EOL: apt-get update still fetches
+# a Packages index that references it, but the actual .deb files 404 everywhere
+# (confirmed against multiple independent mirrors, not just deb.debian.org's CDN).
+# Drop it and use only bullseye/bullseye-updates. This leaves a handful of
+# already-installed base-image packages (pulled in at whatever point the
+# debian:bullseye-slim image was last built from the now-gone security pool)
+# one patch level ahead of what -dev packages here require as an exact match;
+# apt won't downgrade those on its own even with --allow-downgrades unless they
+# are explicitly named, so pin them down first.
+{
+  echo 'deb http://deb.debian.org/debian bullseye main'
+  echo 'deb http://deb.debian.org/debian bullseye-updates main'
+} > /etc/apt/sources.list
+rm -f /etc/apt/sources.list.d/*.list
+apt-get update
+apt-get -y --allow-downgrades install \
+  libc6=2.31-13+deb11u11 \
+  libsepol1=3.1-1 \
+  libudev1=247.3-7+deb11u5 \
+  perl-base=5.32.1-4+deb11u3
+
 STATIC_PACKAGES="libfftw3-bin python3 python3-setuptools netcat-openbsd libsndfile1 liblapack3 libusb-1.0-0 libqt5core5a libreadline8 libgfortran5 libgomp1 libasound2 libudev1 ca-certificates libpulse0 libfaad2 libopus0 libboost-program-options1.74.0 libboost-log1.74.0 libcurl4 alsa-utils libpopt0 libliquid2d libconfig9 libconfig++9v5 imagemagick libncurses6 libliquid2d dablin"
 BUILD_PACKAGES="wget git libsndfile1-dev libfftw3-dev cmake make gcc g++ liblapack-dev texinfo gfortran libusb-1.0-0-dev qtbase5-dev qtmultimedia5-dev qttools5-dev libqt5serialport5-dev qttools5-dev-tools asciidoctor asciidoc libasound2-dev libudev-dev libhamlib-dev patch xsltproc qt5-qmake libfaad-dev libopus-dev libboost-dev libboost-program-options-dev libboost-log-dev libboost-regex-dev libpulse-dev libcurl4-openssl-dev libpopt-dev libliquid-dev libconfig++-dev libncurses-dev libliquid-dev autoconf build-essential automake"
-apt-get update
 apt-get -y install auto-apt-proxy
 apt-get -y install --no-install-recommends $STATIC_PACKAGES $BUILD_PACKAGES
 
@@ -46,8 +67,12 @@ wget https://github.com/just-containers/s6-overlay/releases/download/v1.21.8.0/s
 tar xzf s6-overlay-${PLATFORM}.tar.gz -C /
 rm s6-overlay-${PLATFORM}.tar.gz
 
+# upstream redsea switched its build system from autotools to Meson after
+# v0.21 (no more autogen.sh/configure) — pin to the last autotools release so
+# the rest of this script doesn't need meson/ninja added as build deps.
 git clone https://github.com/windytan/redsea.git
 pushd redsea
+git checkout v0.21
 ./autogen.sh
 ./configure
 make
