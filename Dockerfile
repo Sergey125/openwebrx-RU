@@ -1,73 +1,18 @@
-# Combined multi-stage build (base deps + full app) so a single
-# `docker compose build` / Dockge stack can build the whole image
-# without a separate two-step `docker build` dance.
-#
-# Build context must be the repository root (this file's directory),
-# because both stages COPY from ./docker/... — that path is a symlink
-# to attic/docker/ kept for this reason; keep it when you push to git.
+# Built on top of the maintainer's own published image instead of compiling
+# OpenWebRX+ and all its SDR/decoder dependencies from source. Building from
+# source (see attic/docker/Dockerfiles/) pulls in a lot of upstream build
+# fragility that isn't ours to fix: Debian bullseye's security repo has been
+# decommissioned, redsea dropped its old autotools build, js8call.com's old
+# download URL is dead, and SDRplay's download is now behind a CAPTCHA. The
+# maintainer's own image (built on their infrastructure) doesn't have those
+# problems, and matches this project's version exactly (v1.2.124) — so we
+# just layer our Russian-localization / custom-feature changes on top of it.
+FROM slechev/openwebrxplus-softmbe:latest
 
-FROM debian:bullseye-slim AS base
-ARG MAKEFLAGS
-
-COPY docker/files/js8call/js8call-hamlib.patch \
-     docker/files/js8call/qcustomplot-link.patch \
-     docker/files/js8call/sqlite-link.patch \
-     docker/files/js8call/jpleph-wsjtx.patch \
-     docker/files/wsjtx/wsjtx.patch \
-     docker/files/wsjtx/wsjtx-hamlib.patch \
-     docker/files/dream/dream.patch \
-     docker/files/direwolf/direwolf-hamlib.patch \
-     docker/scripts/add-dependencies.sh /
-RUN /add-dependencies.sh && \
-    rm /add-dependencies.sh && \
-    rm /*.patch
-COPY docker/scripts/add-owrx-tools.sh /
-RUN /add-owrx-tools.sh && \
-    rm /add-owrx-tools.sh
-
-COPY docker/files/services/codecserver /etc/services.d/codecserver
-
-ENTRYPOINT ["/init"]
-
-WORKDIR /opt/openwebrx
-
-VOLUME /etc/openwebrx
-VOLUME /var/lib/openwebrx
-
-ENV S6_CMD_ARG0="/opt/openwebrx/docker/scripts/run.sh"
-CMD []
-
-EXPOSE 8073
-
-
-FROM base AS full
-ARG MAKEFLAGS
-
-COPY docker/scripts/install-*.sh \
-     docker/files/sdrplay/install-lib.*.patch /
-
-RUN export FULL_BUILD=1 && \
-    for x in $(ls -1 /install-*.sh | sort -n); do \
-      echo "installing $x" && \
-      $x || exit 1; \
-    done && \
-    for x in $(ls -1 /install-*.sh | sort -n); do \
-      echo "cleaning $x" && \
-      $x clean; \
-    done && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/* && \
-    rm /install-*.sh && \
-    rm /install-lib.*.patch
-
-COPY docker/files/services/sdrplay /etc/services.d/sdrplay
-
-COPY docker/scripts/run.sh /
-
-# this build-arg will reset the cache here, so we will have a fresh copy of the files
-ARG GIT_HASH=0
-RUN echo "$GIT_HASH" > /build-hash
-RUN date > /build-date
-RUN date +%s > /build-stamp
-
-ADD . /opt/openwebrx
+# Paths as installed by the "openwebrx" .deb package inside that image.
+COPY htdocs/index.html /usr/lib/python3/dist-packages/htdocs/index.html
+COPY owrx/config/defaults.py /usr/lib/python3/dist-packages/owrx/config/defaults.py
+COPY owrx/controllers/settings/general.py /usr/lib/python3/dist-packages/owrx/controllers/settings/general.py
+COPY owrx/controllers/template.py /usr/lib/python3/dist-packages/owrx/controllers/template.py
+COPY owrx/version.py /usr/lib/python3/dist-packages/owrx/version.py
+COPY owrx/feature.py /usr/lib/python3/dist-packages/owrx/feature.py

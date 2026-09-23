@@ -43,23 +43,31 @@ if [[ -z ${1:-} ]]; then
       ;;
   esac
 
-  wget --no-http-keep-alive https://www.sdrplay.com/software/$BINARY
-  sh $BINARY --noexec --target sdrplay
-  patch --verbose -Np0 < /install-lib.$ARCH.patch
+  # SDRplay now gates this download behind a reCAPTCHA challenge on their
+  # site, so it can no longer be fetched unattended in a CI/Docker build.
+  # Skip SDRplay support gracefully rather than failing the whole image over
+  # a driver that requires manually solving a CAPTCHA to obtain.
+  if wget --no-http-keep-alive https://www.sdrplay.com/software/$BINARY; then
+    sh $BINARY --noexec --target sdrplay
+    patch --verbose -Np0 < /install-lib.$ARCH.patch
 
-  cd sdrplay
-  ./install_lib.sh
-  cd ..
-  rm -rf sdrplay
-  rm $BINARY
-  mkdir -p /usr/local/bin
-  mv /opt/sdrplay_api/sdrplay_apiService /usr/local/bin/ || true
+    cd sdrplay
+    ./install_lib.sh
+    cd ..
+    rm -rf sdrplay
+    rm $BINARY
+    mkdir -p /usr/local/bin
+    mv /opt/sdrplay_api/sdrplay_apiService /usr/local/bin/ || true
 
-  #git clone https://github.com/pothosware/SoapySDRPlay3.git
-  # latest from master as of 2021-06-19 (reliability fixes)
-  #cmakebuild SoapySDRPlay3 a869f25364a1f0d5b16169ff908aa21a2ace475d
-  git clone https://github.com/luarvique/SoapySDRPlay3
-  cmakebuild SoapySDRPlay3 $BRANCH
+    #git clone https://github.com/pothosware/SoapySDRPlay3.git
+    # latest from master as of 2021-06-19 (reliability fixes)
+    #cmakebuild SoapySDRPlay3 a869f25364a1f0d5b16169ff908aa21a2ace475d
+    git clone https://github.com/luarvique/SoapySDRPlay3
+    cmakebuild SoapySDRPlay3 $BRANCH
+  else
+    echo "WARNING: could not download SDRplay API (site now requires solving a" >&2
+    echo "CAPTCHA); skipping SDRplay support for this build." >&2
+  fi
 fi
 
 if [[ -z ${FULL_BUILD:-} || ${1:-} == 'clean' ]]; then
