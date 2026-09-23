@@ -1,12 +1,7 @@
 services:
   openwebrx:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: full
-      args:
-        MAKEFLAGS: "-j4"
-    image: openwebrxplus-custom:latest
+    image: ghcr.io/sergey125/openwebrx-masterru:latest
+    pull_policy: always
     container_name: openwebrx
     restart: unless-stopped
     ports:
