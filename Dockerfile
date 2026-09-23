@@ -1,8 +1,8 @@
 # Built on top of the maintainer's own published image instead of compiling
 # OpenWebRX+ and all its SDR/decoder dependencies from source. Building from
-# source (see attic/docker/Dockerfiles/) pulls in a lot of upstream build
-# fragility that isn't ours to fix: Debian bullseye's security repo has been
-# decommissioned, redsea dropped its old autotools build, js8call.com's old
+# source pulls in a lot of upstream build fragility that isn't ours to fix:
+# Debian bullseye's security repo has been decommissioned, redsea dropped
+# its old autotools build, js8call.com's old
 # download URL is dead, and SDRplay's download is now behind a CAPTCHA. The
 # maintainer's own image (built on their infrastructure) doesn't have those
 # problems, and matches this project's version exactly (v1.2.124) — so we
