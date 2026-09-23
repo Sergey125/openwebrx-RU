@@ -18,91 +18,90 @@ OpenWebRX+ (русская сборка)
 
 ---
 
-Ниже — исходное описание проекта OpenWebRX+.
+Ниже — исходное описание проекта OpenWebRX+ (переведено с английского).
 
-This is the **improved version** of the OpenWebRX online SDR. The pre-built OpenWebRX+ packages are available from the [package repository](https://luarvique.github.io/ppa/). Pre-built disk images are available from the [Releases page](https://github.com/luarvique/openwebrx/releases). OpenWebRX+ [documentation](https://fms.komkon.org/OWRX/) draft is now available. News, support, and general discussion can be found in the [Telegram channel](https://t.me/openwebrx) and related [chat](https://t.me/openwebrx_chat). Features found in OpenWebRX+ that are not present in the original version:
-* AIS, SSTV, FAX, FLEX, POCSAG, HFDL, VDL2, ADSB, ACARS, ISM, RDS, SAM, SITOR-B, RTTY, and CW decoders.
-* DTMF, EEA, EIA, CCIR, and several ZVEY SELCALL decoders.
-* Background SSTV and FAX decoding with received images browser.
-* Built-in chat between receiver users.
-* Built-in recorder for received audio.
-* Built-in scanner over bookmarks.
-* Ability for the admin to see user connections and ban abusive users.
-* Adjustable noise filtering based on spectral subtraction.
-* Adjustable tuning step.
-* Automatically created bookmarks for shortwave broadcasts.
-* Automatically created bookmarks for nearby HAM repeaters.
-* Waterfall panning and zooming on touchscreen based devices.
-* Bandpass control with the scroll wheel.
-* Improved tuning in CW mode.
-* More reliable SDRPlay devices operation.
-* Map shows other public web SDRs from all around the world.
-* Map shows shortwave broadcasters from all around the world.
-* Map shows aircraft positions received over ADSB, VDL2, HFDL.
-* Map shows nearby HAM repeaters.
-* Better map information, with distances, APRS paths, weather, etc.
-* Support for configurable session timeout, with a policy page.
-* HTTPS protocol support (requires certificate).
-* Foldable receiver panel with configurable opacity.
-* Spectrum display.
+Это **улучшенная версия** онлайн-приёмника OpenWebRX. Готовые пакеты OpenWebRX+ доступны в [репозитории пакетов](https://luarvique.github.io/ppa/). Готовые образы дисков — на [странице релизов](https://github.com/luarvique/openwebrx/releases). Черновик [документации](https://fms.komkon.org/OWRX/) OpenWebRX+ уже доступен. Новости, поддержка и общее обсуждение — в [Telegram-канале](https://t.me/openwebrx) и связанном [чате](https://t.me/openwebrx_chat). Функции OpenWebRX+, которых нет в оригинальной версии:
+* Декодеры AIS, SSTV, FAX, FLEX, POCSAG, HFDL, VDL2, ADSB, ACARS, ISM, RDS, SAM, SITOR-B, RTTY и CW.
+* Декодеры DTMF, EEA, EIA, CCIR и несколько декодеров ZVEY SELCALL.
+* Фоновое декодирование SSTV и FAX с браузером принятых изображений.
+* Встроенный чат между пользователями приёмника.
+* Встроенный рекордер принимаемого звука.
+* Встроенный сканер по закладкам.
+* Возможность администратора видеть подключения пользователей и банить нарушителей.
+* Настраиваемое подавление шума на основе спектрального вычитания.
+* Настраиваемый шаг перестройки.
+* Автоматически создаваемые закладки для коротковолнового вещания.
+* Автоматически создаваемые закладки для ближайших любительских ретрансляторов.
+* Панорамирование и масштабирование водопада на сенсорных устройствах.
+* Управление полосой пропускания колесом мыши.
+* Улучшенная настройка в режиме CW.
+* Более надёжная работа устройств SDRPlay.
+* Карта показывает другие публичные веб-SDR по всему миру.
+* Карта показывает коротковолновые вещательные станции по всему миру.
+* Карта показывает положение воздушных судов, полученное через ADSB, VDL2, HFDL.
+* Карта показывает ближайшие любительские ретрансляторы.
+* Более подробная информация на карте: расстояния, пути APRS, погода и т.д.
+* Поддержка настраиваемого тайм-аута сеанса со страницей политики использования.
+* Поддержка протокола HTTPS (требуется сертификат).
+* Сворачиваемая панель приёмника с настраиваемой прозрачностью.
+* Отображение спектра.
 
-Original OpenWebRX
+Оригинальный OpenWebRX
 =========
 
-OpenWebRX is a multi-user SDR receiver software with a web interface.
+OpenWebRX — многопользовательское SDR-приёмное ПО с веб-интерфейсом.
 
 ![OpenWebRX](https://www.openwebrx.de/gfx/openwebrx-screenshot.png)
 
-It has the following features:
+Возможности:
 
-- [csdr](https://github.com/jketterl/csdr) based demodulators (AM/FM/SSB/CW/BPSK31/BPSK63)
-- filter passband can be set from GUI
-- it extensively uses HTML5 features like WebSocket, Web Audio API, and Canvas
-- it works in Google Chrome, Chromium and Mozilla Firefox
-- supports a wide range of [SDR hardware](https://github.com/jketterl/openwebrx/wiki/Supported-Hardware#sdr-devices)
-- Multiple SDR devices can be used simultaneously
-- [digiham](https://github.com/jketterl/digiham) based demodularors (DMR, YSF, Pocsag, D-Star, NXDN)
-- [wsjt-x](https://wsjt.sourceforge.io/) based demodulators (FT8, FT4, WSPR, JT65, JT9, FST4,
+- Демодуляторы на основе [csdr](https://github.com/jketterl/csdr) (AM/FM/SSB/CW/BPSK31/BPSK63)
+- Полосу пропускания фильтра можно задать через интерфейс
+- Активно использует возможности HTML5: WebSocket, Web Audio API, Canvas
+- Работает в Google Chrome, Chromium и Mozilla Firefox
+- Поддерживает широкий спектр [SDR-оборудования](https://github.com/jketterl/openwebrx/wiki/Supported-Hardware#sdr-devices)
+- Возможна одновременная работа нескольких SDR-устройств
+- Демодуляторы на основе [digiham](https://github.com/jketterl/digiham) (DMR, YSF, Pocsag, D-Star, NXDN)
+- Демодуляторы на основе [wsjt-x](https://wsjt.sourceforge.io/) (FT8, FT4, WSPR, JT65, JT9, FST4,
   FST4W)
-- [direwolf](https://github.com/wb2osz/direwolf) based demodulation of APRS packets
-- [JS8Call](http://js8call.com/) support
-- [DRM](https://github.com/jketterl/openwebrx/wiki/DRM-demodulator-notes) support
-- [FreeDV](https://github.com/jketterl/openwebrx/wiki/FreeDV-demodulator-notes) support
-- M17 support based on [m17-cxx-demod](https://github.com/mobilinkd/m17-cxx-demod)
+- Демодуляция APRS-пакетов на основе [direwolf](https://github.com/wb2osz/direwolf)
+- Поддержка [JS8Call](http://js8call.com/)
+- Поддержка [DRM](https://github.com/jketterl/openwebrx/wiki/DRM-demodulator-notes)
+- Поддержка [FreeDV](https://github.com/jketterl/openwebrx/wiki/FreeDV-demodulator-notes)
+- Поддержка M17 на основе [m17-cxx-demod](https://github.com/mobilinkd/m17-cxx-demod)
 
-## Setup
+## Установка
 
-The following methods of setting up a receiver are currently available:
+Доступны следующие способы установки приёмника:
 
-- Raspberry Pi SD card images
-- Debian repository
-- Docker images
-- Manual installation
+- Образы SD-карт для Raspberry Pi
+- Репозиторий Debian
+- Docker-образы
+- Установка вручную
 
-Please checkout the [setup guide on the wiki](https://github.com/jketterl/openwebrx/wiki/Setup-Guide) for more details
-on the respective methods.
+Подробности по каждому способу — в [руководстве по установке на wiki](https://github.com/jketterl/openwebrx/wiki/Setup-Guide).
 
-## Community
+## Сообщество
 
-If you have trouble setting up or configuring your receiver, you have some great idea you want to see implemented, or
-you just generally want to have some OpenWebRX-related chat, come visit us over on
-[our groups.io group](https://groups.io/g/openwebrx).
+Если возникли проблемы с установкой или настройкой приёмника, есть отличная идея, которую хотите увидеть реализованной,
+или просто хочется пообщаться на темы OpenWebRX — заходите в
+[нашу группу groups.io](https://groups.io/g/openwebrx).
 
-If you want to hang out, chat, or get in touch directly with the developers, receiver operators or users, feel free to
-drop by in [our Discord server](https://discord.gg/gnE9hPz).
+Если хотите пообщаться напрямую с разработчиками, операторами приёмников или другими пользователями — заходите в
+[наш Discord-сервер](https://discord.gg/gnE9hPz).
 
-## Usage tips
+## Советы по использованию
 
-You can zoom the waterfall display by the mouse wheel. You can also drag the waterfall to pan across it.
+Водопад можно масштабировать колесом мыши. Также его можно перетаскивать для панорамирования.
 
-The filter envelope can be dragged at its ends and moved around to set the passband.
+Границы фильтра можно перетаскивать за края, изменяя полосу пропускания.
 
-However, if you hold down the shift key, you can drag the center line (BFO) or the whole passband (PBS).
+Если удерживать Shift, можно перетаскивать центральную линию (BFO) или всю полосу целиком (PBS).
 
-## Licensing
+## Лицензия
 
-OpenWebRX is available under Affero GPL v3 license
-([summary](https://tldrlegal.com/license/gnu-affero-general-public-license-v3-(agpl-3.0))).
+OpenWebRX распространяется под лицензией Affero GPL v3
+([краткое описание](https://tldrlegal.com/license/gnu-affero-general-public-license-v3-(agpl-3.0))).
 
-OpenWebRX is also available under a commercial license on request. Please contact me at the address
-*&lt;randras@sdr.hu&gt;* for licensing options. 
+OpenWebRX также доступен по коммерческой лицензии по запросу. Для вопросов лицензирования пишите на адрес
+*&lt;randras@sdr.hu&gt;*.
