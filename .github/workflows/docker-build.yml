@@ -4,6 +4,10 @@ on:
   push:
     branches: [main]
   workflow_dispatch: {}
+  schedule:
+    # Rebuild daily even without a push, to pick up updates to the upstream
+    # slechev/openwebrxplus-softmbe base image.
+    - cron: "17 3 * * *"
 
 env:
   REGISTRY: ghcr.io
@@ -39,6 +43,7 @@ jobs:
         with:
           context: .
           file: ./Dockerfile
+          pull: true
           push: true
           tags: |
             ${{ steps.image.outputs.name }}:latest
