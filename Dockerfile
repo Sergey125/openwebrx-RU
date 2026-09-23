@@ -10,6 +10,9 @@ FROM debian:bullseye-slim AS base
 ARG MAKEFLAGS
 
 COPY docker/files/js8call/js8call-hamlib.patch \
+     docker/files/js8call/qcustomplot-link.patch \
+     docker/files/js8call/sqlite-link.patch \
+     docker/files/js8call/jpleph-wsjtx.patch \
      docker/files/wsjtx/wsjtx.patch \
      docker/files/wsjtx/wsjtx-hamlib.patch \
      docker/files/dream/dream.patch \

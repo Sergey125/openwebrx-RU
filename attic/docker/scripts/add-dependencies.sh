@@ -42,8 +42,8 @@ apt-get -y --allow-downgrades install \
   libudev1=247.3-7+deb11u5 \
   perl-base=5.32.1-4+deb11u3
 
-STATIC_PACKAGES="libfftw3-bin python3 python3-setuptools netcat-openbsd libsndfile1 liblapack3 libusb-1.0-0 libqt5core5a libreadline8 libgfortran5 libgomp1 libasound2 libudev1 ca-certificates libpulse0 libfaad2 libopus0 libboost-program-options1.74.0 libboost-log1.74.0 libcurl4 alsa-utils libpopt0 libliquid2d libconfig9 libconfig++9v5 imagemagick libncurses6 libliquid2d dablin"
-BUILD_PACKAGES="wget git libsndfile1-dev libfftw3-dev cmake make gcc g++ liblapack-dev texinfo gfortran libusb-1.0-0-dev qtbase5-dev qtmultimedia5-dev qttools5-dev libqt5serialport5-dev qttools5-dev-tools asciidoctor asciidoc libasound2-dev libudev-dev libhamlib-dev patch xsltproc qt5-qmake libfaad-dev libopus-dev libboost-dev libboost-program-options-dev libboost-log-dev libboost-regex-dev libpulse-dev libcurl4-openssl-dev libpopt-dev libliquid-dev libconfig++-dev libncurses-dev libliquid-dev autoconf build-essential automake"
+STATIC_PACKAGES="libfftw3-bin python3 python3-setuptools netcat-openbsd libsndfile1 liblapack3 libusb-1.0-0 libqt5core5a libreadline8 libgfortran5 libgomp1 libasound2 libudev1 ca-certificates libpulse0 libfaad2 libopus0 libboost-program-options1.74.0 libboost-log1.74.0 libcurl4 alsa-utils libpopt0 libliquid2d libconfig9 libconfig++9v5 imagemagick libncurses6 libliquid2d dablin libqcustomplot2.0 libsqlite3-0"
+BUILD_PACKAGES="wget git libsndfile1-dev libfftw3-dev cmake make gcc g++ liblapack-dev texinfo gfortran libusb-1.0-0-dev qtbase5-dev qtmultimedia5-dev qttools5-dev libqt5serialport5-dev qttools5-dev-tools asciidoctor asciidoc libasound2-dev libudev-dev libhamlib-dev patch xsltproc qt5-qmake libfaad-dev libopus-dev libboost-dev libboost-program-options-dev libboost-log-dev libboost-regex-dev libpulse-dev libcurl4-openssl-dev libpopt-dev libliquid-dev libconfig++-dev libncurses-dev libliquid-dev autoconf build-essential automake libqcustomplot-dev libsqlite3-dev"
 apt-get -y install auto-apt-proxy
 apt-get -y install --no-install-recommends $STATIC_PACKAGES $BUILD_PACKAGES
 
@@ -81,12 +81,28 @@ popd
 
 JS8CALL_VERSION=2.2.0
 JS8CALL_DIR=js8call
-JS8CALL_TGZ=js8call-${JS8CALL_VERSION}.tgz
-wget http://files.js8call.com/${JS8CALL_VERSION}/${JS8CALL_TGZ}
-tar xfz ${JS8CALL_TGZ}
+# files.js8call.com has an expired certificate and the project has since moved
+# to a different fork/site structure, so the original download URL is dead.
+# Debian ships the exact same 2.2.0 source (repackaged as "+ds") in its own
+# pool, which is unaffected by that and gives byte-identical sources the patch
+# below was written against.
+JS8CALL_TGZ=js8call_${JS8CALL_VERSION}+ds.orig.tar.xz
+wget http://deb.debian.org/debian/pool/main/j/js8call/${JS8CALL_TGZ}
+tar xf ${JS8CALL_TGZ}
 # patch allows us to build against the packaged hamlib
 patch -Np1 -d ${JS8CALL_DIR} < /js8call-hamlib.patch
 rm /js8call-hamlib.patch
+# Debian's "+ds" repackaging strips vendored third-party sources (qcustomplot,
+# sqlite3) and a non-free ephemeris data file that the original tarball used
+# to bundle; link against the system libqcustomplot/libsqlite3 packages
+# instead (same fix Debian's own js8call package uses) and skip installing
+# the now-missing ephemeris file.
+patch -Np1 -d ${JS8CALL_DIR} < /qcustomplot-link.patch
+rm /qcustomplot-link.patch
+patch -Np1 -d ${JS8CALL_DIR} < /sqlite-link.patch
+rm /sqlite-link.patch
+patch -Np1 -d ${JS8CALL_DIR} < /jpleph-wsjtx.patch
+rm /jpleph-wsjtx.patch
 cmakebuild ${JS8CALL_DIR}
 rm ${JS8CALL_TGZ}
 
