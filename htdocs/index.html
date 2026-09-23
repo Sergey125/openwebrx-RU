@@ -1,0 +1,1499 @@
+<!DOCTYPE HTML>
+<!--
+
+    This file is part of OpenWebRX+,
+    an open-source SDR receiver software with a web UI.
+    Copyright (c) 2013-2015 by Andras Retzler <randras@sdr.hu>
+    Copyright (c) 2019-2024 by Jakob Ketterl <dd5jfk@darc.de>
+    Copyright (c) 2022-2026 by Marat Fayzullin <luarvique@gmail.com>
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as
+    published by the Free Software Foundation, either version 3 of the
+    License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+-->
+<html>
+    <head>
+        <title>OpenWebRX+ | Open Source SDR Web App for Everyone!</title>
+        <link rel="shortcut icon" type="image/x-icon" href="static/favicon.ico" sizes="16x16 32x32" />
+        <link rel="icon" type="image/png" sizes="32x32" href="static/gfx/favicon32.png" />
+        <link rel="icon" type="image/png" sizes="44x44" href="static/gfx/favicon44.png" />
+        <link rel="icon" type="image/png" sizes="64x64" href="static/gfx/favicon64.png" />
+        <link rel="icon" type="image/png" sizes="96x96" href="static/gfx/favicon96.png" />
+        <link rel="icon" type="image/png" sizes="128x128" href="static/gfx/favicon128.png" />
+        <link rel="apple-touch-icon" href="apple-touch-icon.png">
+        <meta name="msapplication-TileImage" content="mstile-144x144.png">
+        <script src="compiled/receiver.js"></script>
+        <link rel="stylesheet" type="text/css" href="static/lib/nanoscroller.css" />
+        <link rel="stylesheet" type="text/css" href="static/css/openwebrx.css" />
+        <link rel="stylesheet" type="text/css" href="static/css/shortcuts.css" />
+        <link rel="stylesheet" type="text/css" href="static/css/themes.css" />
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9, minimum-scale=0.9, shrink-to-fit=no, user-scalable=no, interactive-widget=overlays-content" />
+        <meta name="theme-color" content="#222" />
+        <script src="static/plugins.js"></script>
+        <style>
+html.ru-hide-settings a[target="openwebrx-settings"] { display: none !important; }
+
+#ru-lang-btn { position: fixed; right: 12px; bottom: 12px; z-index: 9999;
+  min-width: 40px; height: 40px; padding: 0 10px; border: 0; border-radius: 20px;
+  background: rgba(60,60,60,.85); color: #fff; font: bold 13px/40px sans-serif;
+  cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,.4); opacity: .75; }
+#ru-lang-btn:hover { opacity: 1; }
+@media (max-width: 480px) {
+  #ru-lang-btn { height: 34px; line-height: 34px; right: 8px; bottom: 8px; font-size: 12px; }
+}
+
+@media (min-width: 700px) {
+  .openwebrx-main-buttons .button { min-width: 64px; padding: 0 4px; }
+  #openwebrx-themes-listbox, #openwebrx-wf-themes-listbox { width: 120px; max-width: none; }
+}
+
+@media (max-width: 699px) {
+  .openwebrx-main-buttons .button { min-width: 0; padding: 0 3px; font-size: 11px; }
+  .openwebrx-main-buttons .button svg { height: 22px; }
+  .webrx-rx-desc { font-size: 11px; }
+}
+
+@media (max-width: 480px) {
+  .openwebrx-main-buttons .button { padding: 0 1px; font-size: 9.5px; letter-spacing: -0.2px; }
+  .openwebrx-main-buttons .button svg { height: 20px; }
+  .webrx-rx-title { font-size: 14px; }
+  .webrx-rx-desc { font-size: 10px; line-height: 1.3; }
+  .openwebrx-progressbar { font-size: 10px; }
+  #openwebrx-panel-receiver { font-size: 12px; }
+}
+
+#rp-btn { position: fixed; left: 12px; bottom: 12px; z-index: 9999;
+  width: 40px; height: 40px; padding: 0; border: 0; border-radius: 50%;
+  background: rgba(192,57,43,.85); color: #fff; font: 20px/40px sans-serif;
+  cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,.4); opacity: .75; }
+#rp-btn:hover { opacity: 1; background: #e04b39; }
+#rp-mod { position: fixed; inset: 0; z-index: 10000; background: rgba(0,0,0,.6); display: none; }
+#rp-box { position: absolute; left: 12px; bottom: 60px; width: 290px; background: #222;
+  color: #eee; border-radius: 8px; padding: 16px; font: 14px sans-serif;
+  box-shadow: 0 4px 16px rgba(0,0,0,.5); }
+#rp-box label { display: block; margin: 7px 0; cursor: pointer; }
+#rp-box textarea { width: 100%; box-sizing: border-box; margin-top: 8px; background: #111;
+  color: #eee; border: 1px solid #444; border-radius: 4px; padding: 6px; font: 13px sans-serif; }
+#rp-box .row { margin-top: 12px; display: flex; gap: 8px; justify-content: flex-end; }
+#rp-box button { padding: 6px 14px; border: 0; border-radius: 4px; cursor: pointer;
+  font: 13px sans-serif; }
+#rp-send { background: #27ae60; color: #fff; }
+#rp-send:disabled { background: #555; cursor: default; }
+#rp-cancel { background: #555; color: #eee; }
+#rp-msg { margin-top: 8px; font-size: 13px; min-height: 16px; }
+#vt-panel { position: fixed; top: 14px; left: 50%; transform: translateX(-50%); z-index: 10002;
+  background: #222; color: #eee; border: 1px solid #555; border-radius: 8px; padding: 14px 18px;
+  font: 14px sans-serif; text-align: center; max-width: 92vw; display: none;
+  box-shadow: 0 4px 16px rgba(0,0,0,.6); }
+#vt-panel .vt-sub { margin: 8px 0; opacity: .7; font-size: 13px; }
+#vt-panel .vt-mine { margin-top: 6px; font-size: 13px; opacity: .85; }
+#vt-panel .vt-row { display: flex; gap: 8px; justify-content: center; }
+#vt-panel button { padding: 5px 12px; border: 0; border-radius: 4px; cursor: pointer;
+  font: 13px sans-serif; color: #fff; }
+#vt-yes { background: #27ae60; }
+#vt-no { background: #c0392b; }
+#wu-panel { position: fixed; top: 14px; left: 50%; transform: translateX(-50%); z-index: 10003;
+  background: #2d2a1f; color: #f0e6c8; border: 1px solid #7a6a3a; border-radius: 8px;
+  padding: 12px 34px 12px 18px; font: 14px sans-serif; text-align: center; max-width: 92vw;
+  display: none; box-shadow: 0 4px 16px rgba(0,0,0,.6); }
+#wu-panel .wu-sub { margin-top: 6px; font-size: 13px; opacity: .75; }
+#wu-panel .wu-x { position: absolute; top: 6px; right: 10px; cursor: pointer;
+  font-size: 18px; opacity: .7; }
+#wu-panel .wu-x:hover { opacity: 1; }
+@media (max-width: 480px) {
+  #rp-btn { width: 34px; height: 34px; font-size: 17px; line-height: 34px; left: 8px; bottom: 8px; }
+  #rp-box { left: 8px; right: 8px; width: auto; bottom: 50px; }
+}
+        </style>
+    </head>
+    <body onload="openwebrx_init();">
+
+<div id="webrx-page-container" onmousemove="UI.bumpOpacity();" onmousedown="UI.bumpOpacity();">
+    ${header}
+    <div class="openwebrx-waterfall-container">
+        <div id="openwebrx-frequency-container">
+            <div class="openwebrx-bandplan-container" style="z-index:1;">
+                <canvas id="openwebrx-bandplan-canvas" width="0" height="0"></canvas>
+            </div>
+            <div id="openwebrx-bookmarks-container" style="z-index:2;">
+                <div class="openwebrx-button openwebrx-round-button openwebrx-tune-button" style="position:absolute;top:30%;left:0;z-index:3;" title="Tune down" onclick="tuneBySteps(-1);" oncontextmenu="jumpBySteps(-1);return false;">
+                    <svg viewBox="0 0 80 80"><use xlink:href="static/gfx/svg-defs.svg#left"></use></svg>
+                </div>
+                <div class="openwebrx-button openwebrx-round-button openwebrx-tune-button" style="position:absolute;top:30%;right:0;z-index:3;" title="Tune up" onclick="tuneBySteps(1);" oncontextmenu="jumpBySteps(1);return false;">
+                    <svg viewBox="0 0 80 80"><use xlink:href="static/gfx/svg-defs.svg#right"></use></svg>
+                </div>
+            </div>
+            <div class="openwebrx-spectrum-container" style="z-index:1;">
+                <canvas id="openwebrx-spectrum-canvas" width="0" height="0"></canvas>
+            </div>
+            <div id="openwebrx-scale-container" style="z-index:1;">
+                <canvas id="openwebrx-scale-canvas" width="0" height="0"></canvas>
+            </div>
+        </div>
+        <div id="webrx-canvas-background">
+            <div id="webrx-canvas-container">
+                <!-- add canvas here by javascript -->
+            </div>
+        </div>
+        <div id="openwebrx-panels-container">
+            <div id="openwebrx-panels-container-left">
+                <div class="openwebrx-panel openwebrx-message-panel" id="openwebrx-panel-sstv-message" style="display: none; width: 619px;" data-panel-name="sstv-message"></div>
+                <div class="openwebrx-panel openwebrx-message-panel" id="openwebrx-panel-fax-message" style="display: none; width: 619px;" data-panel-name="fax-message"></div>
+                <div class="openwebrx-panel" id="openwebrx-panel-digimodes" style="display: none; width: 92%; max-width: 619px;" data-panel-name="digimodes">
+                    <div id="openwebrx-digimode-canvas-container">
+                        <div id="openwebrx-digimode-select-channel"></div>
+                    </div>
+                    <div id="openwebrx-digimode-content-container">
+                        <div class="gradient"></div>
+                        <div id="openwebrx-digimode-content" class="nano">
+                            <div class="nano-content">
+                                <hr style="border-top: none;border-bottom: 2px dotted;" />
+                                <span id="openwebrx-cursor-blink"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="openwebrx-panel openwebrx-message-panel" id="openwebrx-panel-wsjt-message" style="display: none; width: 619px;" data-panel-name="wsjt-message"></div>
+                <div class="openwebrx-panel openwebrx-message-panel" id="openwebrx-panel-js8-message" style="display:none; width: 619px;" data-panel-name="js8-message"></div>
+                <div class="openwebrx-panel openwebrx-message-panel" id="openwebrx-panel-packet-message" style="display: none; width: 619px;" data-panel-name="aprs-message"></div>
+                <div class="openwebrx-panel openwebrx-message-panel" id="openwebrx-panel-pocsag-message" style="display: none; width: 619px;" data-panel-name="pocsag-message"></div>
+                <div class="openwebrx-panel openwebrx-message-panel" id="openwebrx-panel-page-message" style="display: none; width: 619px;" data-panel-name="page-message"></div>
+                <div class="openwebrx-panel openwebrx-message-panel" id="openwebrx-panel-hfdl-message" style="display: none; width: 619px;" data-panel-name="hfdl-message"></div>
+                <div class="openwebrx-panel openwebrx-message-panel" id="openwebrx-panel-adsb-message" style="display: none; width: 619px;" data-panel-name="adsb-message"></div>
+                <div class="openwebrx-panel openwebrx-message-panel" id="openwebrx-panel-ism-message" style="display: none; width: 619px;" data-panel-name="ism-message"></div>
+                <div class="openwebrx-panel openwebrx-message-panel" id="openwebrx-panel-dsc-message" style="display: none; width: 619px;" data-panel-name="dsc-message"></div>
+                <div class="openwebrx-panel openwebrx-message-panel" id="openwebrx-panel-skimmer-message" style="display: none; width: 619px;" data-panel-name="skimmer-message"></div>
+                <div class="openwebrx-panel openwebrx-message-panel" id="openwebrx-panel-meshtastic-message" style="display: none; width: 619px;" data-panel-name="meshtastic-message"></div>
+                <div class="openwebrx-panel openwebrx-meta-panel" id="openwebrx-panel-metadata-m17" style="display: none;" data-panel-name="metadata-m17">
+                    <div class="openwebrx-meta-slot">
+                        <div class="openwebrx-meta-user-image">
+                            <img class="directcall" src="static/gfx/openwebrx-directcall.svg">
+                        </div>
+                        <div class="openwebrx-m17-source"></div>
+                        <div class="openwebrx-m17-destination"></div>
+                    </div>
+                </div>
+                <div class="openwebrx-panel openwebrx-meta-panel" id="openwebrx-panel-metadata-ysf" style="display: none;" data-panel-name="metadata-ysf">
+                    <div class="openwebrx-meta-slot">
+                        <div class="openwebrx-ysf-mode"></div>
+                        <div class="openwebrx-meta-user-image">
+                            <img class="directcall" src="static/gfx/openwebrx-directcall.svg">
+                        </div>
+                        <div class="openwebrx-ysf-source"><span class="location"></span><span class="callsign"></span></div>
+                        <div class="openwebrx-ysf-up"></div>
+                        <div class="openwebrx-ysf-down"></div>
+                    </div>
+                </div>
+                <div class="openwebrx-panel openwebrx-meta-panel" id="openwebrx-panel-metadata-dstar" style="display: none;" data-panel-name="metadata-dstar">
+                    <div class="openwebrx-meta-slot">
+                        <div class="openwebrx-meta-user-image">
+                            <img class="directcall" src="static/gfx/openwebrx-directcall.svg">
+                        </div>
+                        <div class="openwebrx-dstar-ourcall"><span class="location"></span><span class="callsign"></span></div>
+                        <div class="openwebrx-dstar-message"></div>
+                        <div class="openwebrx-dstar-yourcall"></div>
+                        <div class="openwebrx-dstar-departure"></div>
+                        <div class="openwebrx-dstar-destination"></div>
+                    </div>
+                </div>
+                <div class="openwebrx-panel openwebrx-meta-panel" id="openwebrx-panel-metadata-nxdn" style="display: none;" data-panel-name="metadata-nxdn">
+                    <div class="openwebrx-meta-slot">
+                        <div class="openwebrx-meta-user-image">
+                            <img class="directcall" src="static/gfx/openwebrx-directcall.svg">
+                            <img class="groupcall" src="static/gfx/openwebrx-groupcall.svg">
+                        </div>
+                        <div class="openwebrx-nxdn-source"></div>
+                        <div class="openwebrx-nxdn-name"></div>
+                        <div class="openwebrx-nxdn-destination"></div>
+                    </div>
+                </div>
+                <div class="openwebrx-panel openwebrx-meta-panel" id="openwebrx-panel-metadata-dmr" style="display: none;" data-panel-name="metadata-dmr">
+                    <div class="openwebrx-meta-slot openwebrx-dmr-timeslot-panel">
+                        <div class="openwebrx-dmr-slot">Timeslot 1</div>
+                        <div class="openwebrx-meta-user-image">
+                            <img class="directcall" src="static/gfx/openwebrx-directcall.svg">
+                            <img class="groupcall" src="static/gfx/openwebrx-groupcall.svg">
+                        </div>
+                        <div class="openwebrx-dmr-id"><span class="location"></span><span class="dmr-id"></span></div>
+                        <div class="openwebrx-dmr-name"></div>
+                        <div class="openwebrx-dmr-target"></div>
+                        <div class="mute">
+                            <svg viewBox="0 0 400 400"><use xlink:href="static/gfx/svg-defs.svg#meta-mute"></use></svg>
+                        </div>
+                    </div>
+                    <div class="openwebrx-meta-slot openwebrx-dmr-timeslot-panel">
+                        <div class="openwebrx-dmr-slot">Timeslot 2</div>
+                        <div class="openwebrx-meta-user-image">
+                            <img class="directcall" src="static/gfx/openwebrx-directcall.svg">
+                            <img class="groupcall" src="static/gfx/openwebrx-groupcall.svg">
+                        </div>
+                        <div class="openwebrx-dmr-id"><span class="location"></span><span class="dmr-id"></span></div>
+                        <div class="openwebrx-dmr-name"></div>
+                        <div class="openwebrx-dmr-target"></div>
+                        <div class="mute">
+                            <svg viewBox="0 0 400 400"><use xlink:href="static/gfx/svg-defs.svg#meta-mute"></use></svg>
+                        </div>
+                    </div>
+                </div>
+		<div class="openwebrx-panel openwebrx-meta-panel" id="openwebrx-panel-metadata-p25" style="display: none;" data-panel-name="metadata-p25">
+                    <div class="openwebrx-meta-slot">
+                        <div class="openwebrx-p25-encryption"></div>
+                        <div class="openwebrx-meta-user-image">
+                            <img class="directcall" src="static/gfx/openwebrx-directcall.svg">
+                            <img class="groupcall" src="static/gfx/openwebrx-groupcall.svg">
+                        </div>
+                        <div class="openwebrx-p25-source"></div>
+                        <div class="openwebrx-p25-destination"></div>
+                    </div>
+                </div>
+		<div class="openwebrx-panel openwebrx-meta-panel" id="openwebrx-panel-metadata-tetra" style="display: none;" data-panel-name="metadata-tetra">
+                    <div class="openwebrx-meta-slot">
+                    </div>
+                </div>
+                <div class="openwebrx-panel openwebrx-meta-panel disabled" id="openwebrx-panel-metadata-wfm" style="display: none;" data-panel-name="metadata-wfm"></div>
+                <div class="openwebrx-panel openwebrx-meta-panel" id="openwebrx-panel-metadata-hdr" style="display: none;" data-panel-name="metadata-hdr"></div>
+                <div class="openwebrx-panel openwebrx-meta-panel" id="openwebrx-panel-metadata-dab" style="display: none;" data-panel-name="metadata-dab"></div>
+                <div class="openwebrx-panel openwebrx-meta-panel" id="openwebrx-panel-metadata-drm" style="display: none;" data-panel-name="metadata-drm"></div>
+                <div class="openwebrx-panel" id="openwebrx-panel-log" data-panel-name="debug" style="width: 92%; max-width: 619px;">
+                    <div style="position: relative; height: 100%">
+                        <div class="openwebrx-panel-inner nano" id="openwebrx-log-scroll">
+                            <div class="nano-content">
+                                <div id="openwebrx-client-log-title">OpenWebRX+ message log</div>
+                                <div>
+                                    Author: <a href="http://fms.komkon.org/" target="_blank">Marat Fayzullin</a> |
+                                    <a href="https://fms.komkon.org/OWRX" target="_blank">OpenWebRX+ documentation</a> and
+                                    <a href="https://groups.io/g/openwebrx" target="_blank">support</a>
+                                </div>
+                                <hr />
+                                <div id="openwebrx-messages"></div>
+                            </div>
+                        </div>
+                        <div id="openwebrx-chat-inputs">
+                            <div class="input-group" style="display: flex; justify-content: space-between;">
+                                <input id="openwebrx-chat-name" style="width:15%; margin-right: 0.2rem" placeholder="Name" />
+                                <input id="openwebrx-chat-message" style="width:99%; margin-right: 0.2rem" placeholder="Message" onkeydown="Chat.keyPress(event);" />
+                                <div class="openwebrx-button" onclick="Chat.send();">Send</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="openwebrx-panel" id="openwebrx-panel-status" data-panel-name="status" style="width: 100%; max-width: 615px;" data-panel-transparent="true">
+                    <div class="openwebrx-progressbar" id="openwebrx-bar-audio-buffer" data-type="audiobuffer"></div>
+                    <div class="openwebrx-progressbar" id="openwebrx-bar-audio-output" data-type="audiooutput"></div>
+                    <div class="openwebrx-progressbar" id="openwebrx-bar-audio-speed" data-type="audiospeed"></div>
+                    <div class="openwebrx-progressbar" id="openwebrx-bar-battery" data-type="battery" style="display:none;"></div>
+                    <div class="openwebrx-progressbar" id="openwebrx-bar-network-speed" data-type="networkspeed"></div>
+                    <div class="openwebrx-progressbar" id="openwebrx-bar-server-cpu" data-type="cpu"></div>
+                    <div class="openwebrx-progressbar" id="openwebrx-bar-clients" data-type="clients"></div>
+                </div>
+            </div>
+            <div id="openwebrx-panels-container-right">
+                <div class="openwebrx-panel" id="openwebrx-panel-receiver" data-panel-name="client-params" style="width: 259px;">
+                    <div class="openwebrx-plugin-stack" id="openwebrx-panel-plugins"></div>
+                    <div class="openwebrx-panel-line frequencies-container">
+                        <div class="frequencies">
+                            <div class="webrx-actual-freq"></div>
+                            <div class="webrx-mouse-freq"></div>
+                        </div>
+                        <div class="openwebrx-button openwebrx-square-button openwebrx-bookmark-button" style="display:none;" title="Add bookmark...">
+                            <svg viewBox="0 0 80 80"><use xlink:href="static/gfx/svg-defs.svg#bookmark"></use></svg>
+                        </div>
+                    </div>
+                    <div class="openwebrx-panel-line">
+                        <select id="openwebrx-sdr-profiles-listbox" onchange="sdr_profile_changed();">
+                        </select>
+                    </div>
+                    <div id="openwebrx-section-modes" class="openwebrx-section-divider" onclick="UI.toggleSection(this);">&blacktriangledown;&nbsp;Modes</div>
+                    <div class="openwebrx-section">
+                        <div class="openwebrx-modes openwebrx-panel-line"></div>
+                    </div>
+                    <div id="openwebrx-section-controls" class="openwebrx-section-divider" onclick="UI.toggleSection(this);">&blacktriangledown;&nbsp;Controls</div>
+                    <div class="openwebrx-section">
+                        <div class="openwebrx-panel-line">
+                            <div title="Mute on/off" class="openwebrx-button openwebrx-slider-button openwebrx-mute-button" onclick="UI.toggleMute();">
+                                <svg class="unmuted" viewBox="0 0 80 80"><use xlink:href="static/gfx/svg-defs.svg#speaker"></use></svg>
+                                <svg class="muted" viewBox="0 0 80 80"><use xlink:href="static/gfx/svg-defs.svg#speaker-muted"></use></svg>
+                            </div>
+                            <input title="Volume" id="openwebrx-panel-volume" class="openwebrx-panel-slider" type="range" min="0" max="150" value="100" step="1" onchange="UI.setVolume(this.value);" oninput="UI.setVolume(this.value);">
+                            <div title="Tuning step" class="openwebrx-button openwebrx-slider-button" onclick="tuning_step_reset();">
+                                <svg viewBox="0 0 80 80"><use xlink:href="static/gfx/svg-defs.svg#tuning-step"></use></svg>
+                            </div>
+                            <select id="openwebrx-tuning-step-listbox" class="openwebrx-panel-listbox" onchange="tuning_step_changed();">
+                                <option value="1">1Hz</option>
+                                <option value="10">10Hz</option>
+                                <option value="20">20Hz</option>
+                                <option value="50">50Hz</option>
+                                <option value="100">100Hz</option>
+                                <option value="500">500Hz</option>
+                                <option value="1000">1kHz</option>
+                                <option value="2500">2.5kHz</option>
+                                <option value="3000">3kHz</option>
+                                <option value="5000">5kHz</option>
+                                <option value="6000">6kHz</option>
+                                <option value="6250">6.25kHz</option>
+                                <option value="8330">8.33kHz</option>
+                                <option value="9000">9kHz</option>
+                                <option value="10000">10kHz</option>
+                                <option value="12000">12kHz</option>
+                                <option value="12500">12.5kHz</option>
+                                <option value="25000">25kHz</option>
+                                <option value="50000">50kHz</option>
+                            </select>
+                        </div>
+                        <div class="openwebrx-panel-line">
+                            <div title="Auto-set squelch level (right-click for scanner)" class="openwebrx-squelch-auto openwebrx-button openwebrx-slider-button">
+                                <svg class="squelch" viewBox="0 0 80 80"><use xlink:href="static/gfx/svg-defs.svg#squelch"></use></svg>
+                                <svg class="scanner" viewBox="0 0 80 80"><use xlink:href="static/gfx/svg-defs.svg#scanner-running"></use></svg>
+                            </div>
+                            <input title="Squelch" class="openwebrx-squelch-slider openwebrx-panel-slider" type="range" min="-150" max="0" value="-150" step="1">
+                            <div title="Auto-adjust waterfall colors (right-click for continuous)" id="openwebrx-waterfall-colors-auto" class="openwebrx-button openwebrx-slider-button" onclick="Waterfall.setAutoRange();">
+                                <svg class="auto" viewBox="0 0 80 80"><use xlink:href="static/gfx/svg-defs.svg#waterfall-auto"></use></svg>
+                                <svg class="continuous" viewBox="0 0 80 80"><use xlink:href="static/gfx/svg-defs.svg#waterfall-continuous"></use></svg>
+                            </div>
+                            <input title="Waterfall minimum level" id="openwebrx-waterfall-color-min" class="openwebrx-panel-slider" type="range" min="-200" max="100" value="50" step="1" onchange="Waterfall.updateColors(0);">
+                        </div>
+                        <div class="openwebrx-panel-line">
+                            <div title="Noise reduction on/off" class="openwebrx-nr-toggle openwebrx-button openwebrx-slider-button" onclick="UI.toggleNR();">
+                                <svg viewBox="0 0 80 80"><use xlink:href="static/gfx/svg-defs.svg#noise-reduce"></use></svg>
+                            </div>
+                            <input title="Noise reduction level" disabled id="openwebrx-panel-nr" class="openwebrx-panel-slider" type="range" min="-20" max="20" value="0" step="1" onchange="UI.setNR(this.value)" oninput="UI.setNR(this.value)">
+                            <div title="Set waterfall colors to default" id="openwebrx-waterfall-colors-default" class="openwebrx-button openwebrx-slider-button" onclick="Waterfall.setDefaultRange();">
+                                <svg viewBox="0 0 80 80"><use xlink:href="static/gfx/svg-defs.svg#waterfall-default"></use></svg>
+                            </div>
+                            <input title="Waterfall maximum level" id="openwebrx-waterfall-color-max" class="openwebrx-panel-slider" type="range" min="-200" max="100" value="50" step="1" onchange="Waterfall.updateColors(1);">
+                        </div>
+                    </div>
+                    <div id="openwebrx-section-settings" class="openwebrx-section-divider" onclick="UI.toggleSection(this);">&blacktriangle;&nbsp;Settings</div>
+                    <div class="openwebrx-section">
+                        <div class="openwebrx-panel-line">
+                            <div title="Reset theme" class="openwebrx-button openwebrx-slider-button" onclick="UI.setTheme('default');">
+                                <svg viewBox="56 -900 835 835" style="overflow: visible"><use xlink:href="static/gfx/svg-defs.svg#theme-chooser"></use></svg>
+                            </div>
+                            <select title="Theme" id="openwebrx-themes-listbox" class="openwebrx-panel-listbox" onchange="UI.setTheme(this.value);">
+                                <option value="">Default</option>
+                                <option value="default">Gray</option>
+                                <option value="brown">Brown</option>
+                                <option value="red">Red</option>
+                                <option value="green">Green</option>
+                                <option value="khaki">Khaki</option>
+                                <option value="blue">Blue</option>
+                                <option value="navy">Navy</option>
+                                <option value="black">Black</option>
+                                <option value="night">Night</option>
+                            </select>
+                            <div title="Toggle opacity bump" class="openwebrx-button openwebrx-slider-button openwebrx-opacity-button" onclick="UI.toggleOpacity();">
+                                <svg class="unbumped" viewBox="56 -900 835 835"><use xlink:href="static/gfx/svg-defs.svg#opacity"></use></svg>
+                                <svg class="bumped" viewBox="56 -900 835 835"><use xlink:href="static/gfx/svg-defs.svg#opacity-bump"></use></svg>
+                            </div>
+                            <input title="Opacity" id="openwebrx-opacity-slider" class="openwebrx-panel-slider" type="range" min="10" max="100" value="100" step="1" oninput="UI.setOpacity(this.value);">
+                        </div>
+                        <div class="openwebrx-panel-line">
+                            <div title="Reset waterfall theme" class="openwebrx-button openwebrx-slider-button" onclick="UI.setWfTheme('default');">
+                                <svg viewBox="56 -900 835 835" style="overflow: visible"><use xlink:href="static/gfx/svg-defs.svg#wf-theme-chooser"></use></svg>
+                            </div>
+                            <select title="Waterfall theme" id="openwebrx-wf-themes-listbox" class="openwebrx-panel-listbox" onchange="UI.setWfTheme(this.value);">
+                                <option value="default">Default</option>
+                                <option value="turbo">Turbo</option>
+                                <option value="ha7ilm">Legacy</option>
+                                <option value="teejeez">Teejeez</option>
+                                <option value="ocean">Ocean</option>
+                                <option value="eclipse">Eclipse</option>
+                            </select>
+                        </div>
+                        <div class="openwebrx-panel-line">
+                            <label class="openwebrx-checkbox">
+                                <input id="openwebrx-frame-checkbox" type="checkbox" onchange="UI.toggleFrame(this.checked);" />
+                                Draw white frame around panels
+                            </label>
+                        </div>
+                        <div class="openwebrx-panel-line">
+                            <label class="openwebrx-checkbox">
+                                <input id="openwebrx-wheel-checkbox" type="checkbox" onchange="UI.toggleWheelSwap(this.checked);" />
+                                Hold mouse wheel down to tune
+                            </label>
+                        </div>
+                        <div class="openwebrx-panel-line">
+                            <label class="openwebrx-checkbox">
+                                <input id="openwebrx-crossfreq-checkbox" type="checkbox" onchange="UI.toggleCrossFreq(this.checked);" />
+                                Show pointer frequency
+                            </label>
+                        </div>
+                        <div class="openwebrx-panel-line">
+                            <label class="openwebrx-checkbox">
+                                <input id="openwebrx-bandplan-checkbox" type="checkbox" onchange="UI.toggleBandplan(this.checked);" />
+                                Show band plan ribbon
+                            </label>
+                        </div>
+                    </div>
+                    <div id="openwebrx-section-display" class="openwebrx-section-divider" onclick="UI.toggleSection(this);">&blacktriangledown;&nbsp;Display</div>
+                    <div class="openwebrx-section">
+                        <div class="openwebrx-panel-line">
+                            <div class="openwebrx-button openwebrx-square-button openwebrx-zoom-button" onclick="zoomInOneStep();" title="Zoom in one step"><svg viewBox="0 0 80 80"><use xlink:href="static/gfx/svg-defs.svg#zoom-in"></use></svg></div>
+                            <div class="openwebrx-button openwebrx-square-button openwebrx-zoom-button" onclick="zoomOutOneStep();" title="Zoom out one step"><svg viewBox="0 0 80 80"><use xlink:href="static/gfx/svg-defs.svg#zoom-out"></use></svg></div>
+                            <div class="openwebrx-button openwebrx-square-button openwebrx-zoom-button" onclick="zoomInTotal();"  title="Zoom in totally"><svg viewBox="0 0 80 80"><use xlink:href="static/gfx/svg-defs.svg#zoom-in-total"></use></svg></div>
+                            <div class="openwebrx-button openwebrx-square-button openwebrx-zoom-button" onclick="zoomOutTotal();" title="Zoom out totally"><svg viewBox="0 0 80 80"><use xlink:href="static/gfx/svg-defs.svg#zoom-out-total"></use></svg></div>
+                            <div class="openwebrx-button openwebrx-square-button openwebrx-zoom-button" onclick="UI.toggleSpectrum();" title="Toggle spectrum display"><svg viewBox="0 0 80 80"><use xlink:href="static/gfx/svg-defs.svg#spectrum"></use></svg></div>
+                            <div class="openwebrx-button openwebrx-square-button openwebrx-record-button" onclick="UI.toggleRecording();" title="Record audio">REC</div>
+                        </div>
+                        <div class="openwebrx-panel-line">
+                            <div id="openwebrx-smeter">
+                                <div class="openwebrx-smeter-bar"></div>
+                            </div>
+                            <div id="openwebrx-clock-utc">00:00 UTC</div>
+                            <div id="openwebrx-smeter-db">0 dB</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="openwebrx-error-overlay" class="openwebrx-overlay" style="display:none;">
+            <div class="overlay-content">
+                <div>This receiver is currently unavailable due to technical issues.</div>
+                <div>Error Message:</div>
+                <div class="errormessage"></div>
+            </div>
+        </div>
+    </div>
+</div>
+    <div id="openwebrx-autoplay-overlay" class="openwebrx-overlay" style="display:none;">
+        <div class="overlay-content">
+            <span style="position:relative;">
+                <svg viewBox="0 0 700 700"><use xlink:href="static/gfx/svg-defs.svg#play-button"></use></svg>
+                <a id="openwebrx-get-android-app" href="https://play.google.com/store/apps/details?id=com.fms.owrx" target="_blank" style="display:none;position:absolute;bottom:120px;left:120px;">
+                    <img src="static/gfx/openwebrx-get-android-app.svg" width="100" height="100" />
+                </a>
+            </span>
+            <div>Start OpenWebRX+</div>
+        </div>
+    </div>
+    <div id="openwebrx-message-bubble" class="openwebrx-bubble" style="display:none;">
+    </div>
+    <div id="openwebrx-dialog-bookmark" class="openwebrx-dialog" style="display:none;">
+        <form>
+            <div class="form-field">
+                <h2>Edit Bookmark</h2>
+            </div>
+            <div class="form-field">
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" required="required">
+            </div>
+            <div class="form-field">
+                <label for="frequency">Frequency:</label>
+                <input type="number" id="frequency" name="frequency" min="1">
+            </div>
+            <div class="form-field">
+                <label for="modulation">Modulation:</label>
+                <select name="modulation" id="modulation"></select>
+            </div>
+            <div class="form-field">
+                <label for="underlying">Underlying:</label>
+                <select name="underlying" id="underlying"></select>
+            </div>
+            <div class="form-field">
+                <label for="name">Description:</label>
+                <input type="text" id="description" name="description">
+            </div>
+            <div class="form-field">
+                <label for="name">Scannable</label>
+                <input type="checkbox" id="scannable" name="scannable" checked>
+            </div>
+            <div class="buttons">
+                <div class="openwebrx-button" data-action="cancel">Cancel</div>
+                <div class="openwebrx-button" data-action="submit">Save</div>
+            </div>
+            <input type="submit" style="display:none;">
+        </form>
+    </div>
+    <div id="openwebrx-dialog-search-bookmarks" class="openwebrx-dialog" style="display:none;">
+        <form>
+            <div class="form-field">
+                <h2>Search Bookmarks</h2>
+            </div>
+            <div class="form-field">
+                <input type="text" id="search-text" name="search-text" required="required">
+            </div>
+            <div class="form-field" id="search-results">
+            </div>
+            <div class="buttons">
+                <div class="openwebrx-button" data-action="cancel">Close</div>
+                <div class="openwebrx-button" data-action="submit">Search</div>
+            </div>
+            <input type="submit" style="display:none;">
+        </form>
+    </div>
+    <script>window.ruFeaturesConfig = $ruFeaturesConfig;</script>
+    <script>
+(function(){
+var cfg = window.ruFeaturesConfig || {};
+var isSettingsPage = window.location.pathname.indexOf('/settings') !== -1;
+
+if (cfg.hideSettingsLink) document.documentElement.classList.add('ru-hide-settings');
+
+// Блок 1: Переводы интерфейса + переключатель языка
+if (cfg.translateEnabled) (function(){
+
+var narrow = window.matchMedia && window.matchMedia("(max-width: 480px)").matches;
+
+var D={
+"Help":"Справка","Status":"Статус","Chat":"Чат","Receiver":narrow?"Приём":"Приёмник","Map":"Карта","Files":"Файлы","Settings":"Настройки",
+"Modes":"Режимы","Controls":"Управление","Display":"Отображение",
+"Visit the OpenWebRX homepage":"Сайт OpenWebRX","Receiver avatar":"Аватар приёмника",
+"Tune down":"Ниже по частоте","Tune up":"Выше по частоте","Add bookmark...":"Добавить закладку...",
+"Mute on/off":"Звук вкл/выкл","Volume":"Громкость","Tuning step":"Шаг настройки",
+"Auto-set squelch level (right-click for scanner)":"Авто-шумоподавитель (ПКМ — сканер)","Squelch":"Шумоподавитель",
+"Auto-adjust waterfall colors (right-click for continuous)":"Авто-цвета водопада (ПКМ — непрерывно)",
+"Waterfall minimum level":"Минимум водопада","Waterfall maximum level":"Максимум водопада",
+"Set waterfall colors to default":"Цвета водопада по умолчанию",
+"Noise reduction on/off":"Шумоподавление вкл/выкл","Noise reduction level":"Уровень шумоподавления",
+"Reset theme":"Сбросить тему","Theme":"Тема","Reset waterfall theme":"Сбросить тему водопада","Waterfall theme":"Тема водопада",
+"Toggle opacity bump":"Подсветка при наведении","Opacity":"Прозрачность",
+"Zoom in one step":"Приблизить на шаг","Zoom out one step":"Отдалить на шаг",
+"Zoom in totally":"Приблизить полностью","Zoom out totally":"Отдалить полностью",
+"Toggle spectrum display":"Показ спектра","Record audio":"Запись звука",
+"Default":"Обычная","Gray":"Серая","Brown":"Коричневая","Red":"Красная","Green":"Зелёная","Khaki":"Хаки",
+"Blue":"Синяя","Navy":"Тёмно-синяя","Black":"Чёрная","Night":"Ночная","Legacy":"Классическая","Ocean":"Океан",
+"Draw white frame around panels":"Белая рамка вокруг панелей",
+"Hold mouse wheel down to tune":"Настройка при зажатом колесе",
+"Show band plan ribbon":"Показывать план диапазонов",
+"OpenWebRX+ message log":"Журнал сообщений OpenWebRX+","Author":"Автор","Send":"Отправить",
+"Name":"Имя","Message":"Сообщение","Name:":"Название:","Frequency:":"Частота:","Modulation:":"Модуляция:",
+"Underlying:":"Базовый режим:","Description:":"Описание:","Scannable":"Сканировать",
+"Edit Bookmark":"Изменение закладки","Search Bookmarks":"Поиск закладок",
+"Cancel":"Отмена","Save":"Сохранить","Close":"Закрыть","Search":"Найти",
+"Timeslot 1":"Слот 1","Timeslot 2":"Слот 2",
+"Start OpenWebRX+":"Запустить OpenWebRX+",
+"This receiver is currently unavailable due to technical issues.":"Приёмник временно недоступен по техническим причинам.",
+"Error Message:":"Текст ошибки:"
+};
+
+// Словарь для страницы /settings (админ-панель) — своя таблица, чтобы короткие
+// общие слова (единицы измерения и т.п.) не задевали основной интерфейс приёмника.
+var SD={
+"General Settings":"Общие настройки","Receiver information":"Информация о приёмнике",
+"Receiver name":"Название приёмника","Receiver location":"Местоположение приёмника",
+"Receiver elevation":"Высота приёмника над уровнем моря","meters above mean sea level":"метров над уровнем моря",
+"Receiver admin":"Администратор приёмника","Receiver band plan":"Диапазонный план приёмника",
+"Default (generalized for all regions)":"По умолчанию (общий для всех регионов)",
+"ITU Region 1 (Africa, Europe, Middle East, North Asia)":"Регион МСЭ 1 (Африка, Европа, Ближний Восток, Северная Азия)",
+"ITU Region 2 (North America, South America)":"Регион МСЭ 2 (Северная Америка, Южная Америка)",
+"ITU Region 3 (South Asia, Pacific)":"Регион МСЭ 3 (Южная Азия, Тихоокеанский регион)",
+"Band plan ribbons and region-specific default bookmarks will follow the selected ITU region.":"Полосы диапазонного плана и региональные закладки по умолчанию будут соответствовать выбранному региону МСЭ.",
+"Receiver country":"Страна приёмника",
+"Country-specific default bookmarks will follow the selected country.":"Закладки по умолчанию для конкретной страны будут соответствовать выбранной стране.",
+"Receiver coordinates":"Координаты приёмника",
+"Update receiver coordinates via GPS (if device present)":"Обновлять координаты приёмника по GPS (если устройство подключено)",
+"Photo title":"Заголовок фотографии","Photo description":"Описание фотографии","HTML supported ":"Поддерживается HTML",
+"Receiver images":"Изображения приёмника","Receiver Avatar":"Аватар приёмника",
+"Maximum file size is 256kB. For performance reasons, images are cached. It can take a few hours until they appear on the site.":"Максимальный размер файла — 256 КБ. Из соображений производительности изображения кэшируются. Может пройти несколько часов, прежде чем они появятся на сайте.",
+"Receiver Panorama":"Панорама приёмника",
+"Maximum file size is 2MB. For performance reasons, images are cached. It can take a few hours until they appear on the site.":"Максимальный размер файла — 2 МБ. Из соображений производительности изображения кэшируются. Может пройти несколько часов, прежде чем они появятся на сайте.",
+"Receiver limits":"Ограничения приёмника","Maximum number of clients":"Максимальное число клиентов",
+"Number of people who can connect at the same time.":"Количество пользователей, которые могут подключаться одновременно.",
+"Number of clients per IP":"Число клиентов с одного IP",
+"Number of people who can connect from the same IP address.":"Количество пользователей, которые могут подключаться с одного IP-адреса.",
+"Maximum number of files":"Максимальное число файлов",
+"Number of received images and other files to keep.":"Количество принятых изображений и других файлов для хранения.",
+"Session timeout":"Тайм-аут сеанса",
+"Client session timeout in seconds (0 to disable timeout).":"Тайм-аут сеанса клиента в секундах (0 — отключить тайм-аут).",
+"Usage policy URL":"URL политики использования",
+"Specifies web page describing receiver usage policy and shown when a client session times out.":"Указывает веб-страницу с политикой использования приёмника, которая показывается при истечении тайм-аута сеанса.",
+"Detect and ban bots trying to connect":"Обнаруживать и блокировать ботов, пытающихся подключиться",
+"Allow users to chat with each other":"Разрешить пользователям общаться в чате",
+"Allow users to record received audio":"Разрешить пользователям записывать принимаемый звук",
+"Allow users to change center frequency":"Разрешить пользователям менять центральную частоту",
+"Magic key":"Секретный ключ",
+"Enter the key users have to supply to change center frequency. Leave empty if you do not want to protect frequency changes with a key. When enabled, the key has to be added to receiver's URL after the hash sign: http://my.receiver.com/#key=keyvalue.":"Введите ключ, который пользователи должны указать для изменения центральной частоты. Оставьте пустым, если не требуется защищать изменение частоты ключом. При включении ключ нужно добавлять в URL приёмника после знака решётки: http://my.receiver.com/#key=keyvalue.",
+"Receiver listings":"Списки приёмника","Receiver keys":"Ключи приёмника",
+"Put the keys you receive on listing sites (e.g. ":"Укажите ключи, полученные на сайтах-каталогах (например,",
+"Receiverbook":"Receiverbook",") here, one per line":"), по одному на строку",
+"Waterfall settings":"Настройки водопада","Waterfall color theme":"Цветовая схема водопада",
+"Custom waterfall colors":"Пользовательские цвета водопада",
+"Please provide 6-digit hexadecimal RGB colors in HTML notation (#RRGGBB) or HEX notation (0xRRGGBB), one per line":"Укажите 6-значные шестнадцатеричные RGB-цвета в HTML-нотации (#RRGGBB) или HEX-нотации (0xRRGGBB), по одному на строку",
+"FFT speed":"Скорость БПФ",
+"This setting specifies how many lines are being added to the waterfall per second. Higher values will give you a faster waterfall, but will also use more CPU.":"Этот параметр задаёт, сколько строк в секунду добавляется в водопад. Более высокие значения дают более быстрый водопад, но увеличивают нагрузку на процессор.",
+"frames per second":"кадров в секунду","FFT size":"Размер БПФ",
+"This setting specifies the horizontal resolution of the waterfall. Raising it higher than 16384 bins may break waterfall display on some web browsers.":"Этот параметр задаёт горизонтальное разрешение водопада. Значение выше 16384 бинов может нарушить отображение водопада в некоторых браузерах.",
+"bins":"бинов","FFT vertical overlap factor":"Коэффициент вертикального перекрытия БПФ",
+"If fft_voverlap_factor is above 0, multiple FFTs will be used for creating a line on the diagram.":"Если коэффициент вертикального перекрытия БПФ больше 0, для построения одной строки диаграммы будет использовано несколько БПФ.",
+"Waterfall levels":"Уровни водопада","Automatic adjustment margins":"Границы автоматической настройки",
+"Specifies the upper and lower dynamic headroom that should be added when automatically adjusting waterfall colors":"Задаёт верхний и нижний динамический запас, добавляемый при автоматической настройке цветов водопада",
+"Automatically adjust waterfall level by default":"Автоматически настраивать уровень водопада по умолчанию",
+"Enable this to automatically enable auto adjusting waterfall levels on page load.":"Включите, чтобы автоматическая настройка уровней водопада включалась при загрузке страницы.",
+"Automatic adjustment minimum range":"Минимальный диапазон автоматической настройки",
+"Minimum dynamic range the waterfall should cover after automatically adjusting waterfall colors":"Минимальный динамический диапазон, который должен охватывать водопад после автоматической настройки цветов",
+"dB":"дБ","Compression":"Сжатие","Audio compression":"Сжатие звука","ADPCM":"ADPCM","None":"Нет",
+"Waterfall compression":"Сжатие водопада","Display settings":"Настройки отображения",
+"User interface color theme":"Цветовая тема интерфейса","Gray":"Серая","Brown":"Коричневая","Red":"Красная",
+"Green":"Зелёная","Khaki":"Хаки","Blue":"Синяя","Navy":"Тёмно-синяя","Black":"Чёрная","Night":"Ночная",
+"Tuning precision":"Точность настройки","Shortwave bookmarks range":"Радиус коротковолновых закладок",
+"Specifies the distance from the receiver location to search EIBI schedules for stations when creating automatic bookmarks. Set to 0 to disable automatic EIBI bookmarks.":"Задаёт расстояние от местоположения приёмника, в пределах которого выполняется поиск станций по расписаниям EIBI при создании автоматических закладок. Установите 0, чтобы отключить автоматические закладки EIBI.",
+"km":"км","Repeater bookmarks range":"Радиус закладок ретрансляторов",
+"Specifies the distance from the receiver location to search RepeaterBook.com for repeaters when creating automatic bookmarks. Set to 0 to disable automatic repeater bookmarks.":"Задаёт расстояние от местоположения приёмника, в пределах которого выполняется поиск ретрансляторов на RepeaterBook.com при создании автоматических закладок. Установите 0, чтобы отключить автоматические закладки ретрансляторов.",
+"Map settings":"Настройки карты","Map type":"Тип карты","Google Maps":"Google Maps","OpenStreetMap, etc.":"OpenStreetMap и др.",
+"Google Maps API key":"Ключ API Google Maps",
+"Google Maps requires an API key, check out ":"Для Google Maps требуется ключ API, ознакомьтесь с",
+"their documentation":"их документацией"," on how to obtain one.":", чтобы узнать, как его получить.",
+"OpenWeatherMap API key":"Ключ API OpenWeatherMap",
+"OpenWeatherMap requires an API key, check out ":"Для OpenWeatherMap требуется ключ API, ознакомьтесь с",
+"Map retention time":"Время хранения меток на карте",
+"Specifies how long markers / grids will remain visible on the map.":"Задаёт, как долго метки / квадраты на карте остаются видимыми.",
+"s":"с","Call retention time":"Время хранения вызовов",
+"Specifies how long calls will remain visible on the map.":"Задаёт, как долго вызовы остаются видимыми на карте.",
+"Number of calls shown":"Число отображаемых вызовов",
+"Specifies how many calls between grids are visible on the map.":"Задаёт, сколько вызовов между квадратами отображается на карте.",
+"Ignore position reports arriving via indirect path.":"Игнорировать сообщения о местоположении, полученные не напрямую.",
+"Prefer more recent position reports to shorter path reports.":"Предпочитать более свежие сообщения о местоположении сообщениям с более коротким путём.",
+"External links":"Внешние ссылки","Callsign database URL":"URL базы данных позывных",
+"Specifies callsign lookup URL, such as QRZ.COM or QRZCQ.COM. Place curly brackets ({}) where callsign is supposed to be.":"Задаёт URL для поиска позывных, например QRZ.COM или QRZCQ.COM. Поставьте фигурные скобки ({}) на месте позывного.",
+"Vessel database URL":"URL базы данных судов",
+"Specifies vessel lookup URL, such as VESSELFINDER.COM, allowing to look up vessel information by its AIS MMSI number. Place curly brackets ({}) where MMSI is supposed to be.":"Задаёт URL для поиска судов, например VESSELFINDER.COM, позволяющий находить информацию о судне по его номеру MMSI AIS. Поставьте фигурные скобки ({}) на месте MMSI.",
+"Flight database URL":"URL базы данных рейсов",
+"Specifies flight lookup URL, such as FLIGHTAWARE.COM, allowing to look up flights and aircraft. Place curly brackets ({}) where flight or aircraft identifier is supposed to be.":"Задаёт URL для поиска рейсов, например FLIGHTAWARE.COM, позволяющий находить рейсы и воздушные суда. Поставьте фигурные скобки ({}) на месте идентификатора рейса или борта.",
+"Aircraft database URL":"URL базы данных воздушных судов",
+"Specifies aircraft lookup URL, such as PLANESPOTTERS.NET, allowing to look up aircraft by their Mode-S codes. Place curly brackets ({}) where aircraft Mode-S code is supposed to be.":"Задаёт URL для поиска воздушных судов, например PLANESPOTTERS.NET, позволяющий находить борта по их кодам Mode-S. Поставьте фигурные скобки ({}) на месте кода Mode-S.",
+"Radiosonde database URL":"URL базы данных радиозондов",
+"Specifies radiosonde lookup URL, such as SONDEHUB.ORG, allowing to look up sonde information by its ID number. Place curly brackets ({}) where ID is supposed to be.":"Задаёт URL для поиска радиозондов, например SONDEHUB.ORG, позволяющий находить информацию о зонде по его ID. Поставьте фигурные скобки ({}) на месте ID.",
+"IP geolocation URL":"URL геолокации по IP",
+"Specifies IP geolocation URL, such as GEOLOCATION.COM, allowing to estimate geographic locations of IP addresses. Place curly brackets ({}) where IP is supposed to be.":"Задаёт URL геолокации по IP, например GEOLOCATION.COM, позволяющий оценивать географическое положение по IP-адресу. Поставьте фигурные скобки ({}) на месте IP.",
+"Custom Russian UI features":"Дополнительные русскоязычные функции интерфейса",
+"Translate interface labels and tooltips to Russian":"Переводить надписи и подсказки интерфейса на русский язык",
+"Show a floating 'report a problem' button":"Показывать плавающую кнопку «сообщить о проблеме»",
+"Report webhook URL":"URL вебхука для отчётов",
+"Webhook URL that problem reports are POSTed to as JSON.":"URL вебхука, на который отчёты о проблемах отправляются методом POST в формате JSON.",
+"Enable listener voting before switching SDR profile":"Включить голосование слушателей перед сменой профиля SDR",
+"Voting webhook URL":"URL вебхука для голосования",
+"Webhook URL used to coordinate profile-switch votes between listeners.":"URL вебхука, используемый для координации голосования слушателей за смену профиля.",
+"Show a 'receiver is starting up' notice while no data is flowing":"Показывать уведомление «приёмник запускается», пока нет данных",
+"Hide the settings/login link on the main page":"Скрыть ссылку настроек/входа на главной странице",
+"Change password for '{0}'":"Смена пароля для «{0}»","Current password":"Текущий пароль",
+"Enter current password in order to change it.":"Введите текущий пароль, чтобы изменить его.",
+"New password":"Новый пароль","Enter non-empty value in order to change the password.":"Введите непустое значение, чтобы изменить пароль.",
+"Repeat new password":"Повторите новый пароль",
+"Enter the same value in order to change the password.":"Введите то же значение, чтобы изменить пароль.",
+"Cannot change password. The current password is incorrect.":"Невозможно изменить пароль. Текущий пароль указан неверно.",
+"Cannot change password. The new passwords do not match.":"Невозможно изменить пароль. Новые пароли не совпадают.",
+"Settings":"Настройки","Apply and save":"Применить и сохранить","Error":"Ошибка",
+"Your settings could not be saved due to an error:":"Не удалось сохранить настройки из-за ошибки:",
+"Bookmark editor":"Редактор закладок",
+"No bookmarks in storage. You can add new bookmarks using the buttons below. ":"Закладок нет. Вы можете добавить новые закладки с помощью кнопок ниже.",
+"Name":"Название","Frequency":"Частота","Modulation":"Модуляция","Underlying":"Базовая модуляция",
+"Description":"Описание","Scan":"Скан","Actions":"Действия","delete":"удалить",
+"Bookmark missing required fields":"В закладке отсутствуют обязательные поля",
+"Empty bookmark name":"Пустое имя закладки","Frequency must be positive":"Частота должна быть положительной",
+"Invalid modulation":"Неверная модуляция","Incorrect underlying modulation":"Неверная базовая модуляция",
+"Demodulation and decoding":"Демодуляция и декодирование","Miscellaneous":"Разное",
+"Auto-Squelch threshold":"Порог автошумоподавителя",
+"Offset to be added to the current signal level when using the auto-squelch":"Смещение, добавляемое к текущему уровню сигнала при использовании автошумоподавителя",
+"Secondary FFT size":"Размер вторичного БПФ","Secondary waterfall resolution in digital modes":"Разрешение вторичного водопада в цифровых режимах",
+"SSB AGC profile":"Профиль АРУ для SSB","AGC profile used for LSB, USB, and CW analog modes":"Профиль АРУ, используемый для аналоговых режимов LSB, USB и CW",
+"AM AGC profile":"Профиль АРУ для AM","AGC profile used for AM and SAM analog modes":"Профиль АРУ, используемый для аналоговых режимов AM и SAM",
+"NFM AGC profile":"Профиль АРУ для NFM","AGC profile used for the NFM analog mode":"Профиль АРУ, используемый для аналогового режима NFM",
+"DAB audio rate":"Частота дискретизации звука DAB","Your local DAB station may use a different audio rate":"Ваша местная станция DAB может использовать другую частоту дискретизации",
+"Tau setting for WFM (broadcast FM) deemphasis":"Постоянная времени коррекции предыскажений WFM (радиовещательное ЧМ)",
+"See ":"См. ","this Wikipedia article":"эту статью в Википедии"," for more information":" для получения дополнительной информации",
+"Decode USA-specific RBDS information from WFM broadcasts":"Декодировать американскую информацию RBDS из радиостанций WFM",
+"Show CW codes (dits / dahs) when decoding CW":"Показывать код CW (точки/тире) при декодировании CW",
+"Show partial messages when decoding DSC":"Показывать частичные сообщения при декодировании DSC",
+"Report ISM signal levels (RSSI/SNR)":"Сообщать уровни сигнала ISM (RSSI/SNR)",
+"Digital voice":"Цифровая голосовая связь","Codecserver address":"Адрес codecserver",
+"Address of a remote codecserver instance (name[:port]). Leave empty to use local codecserver":"Адрес удалённого сервера codecserver (имя[:порт]). Оставьте пустым для использования локального codecserver",
+"Enable lookup of DMR ids in the ":"Включить поиск идентификаторов DMR в базе ","radioid":"radioid"," database to show callsigns and names":" для отображения позывных и имён",
+"Enable lookup of NXDN ids in the ":"Включить поиск идентификаторов NXDN в базе ",
+"Background audio recording":"Фоновая запись звука","Recording squelch level":"Уровень шумоподавителя для записи",
+"Signal-to-noise ratio (SNR) that triggers recording":"Отношение сигнал/шум (SNR), при котором начинается запись",
+"Recording squelch hang time":"Время удержания шумоподавителя записи",
+"Time recording keeps going after signal disappears":"Время, в течение которого запись продолжается после пропадания сигнала",
+"ms":"мс","Record silence when there is no signal":"Записывать тишину при отсутствии сигнала",
+"Speech to text transcription":"Распознавание речи в текст","Whisper transcription server":"Сервер распознавания Whisper",
+"Server URL used to send audio for transcription into text":"URL сервера, на который отправляется звук для распознавания в текст",
+"Transcription squelch level":"Уровень шумоподавителя для распознавания",
+"Signal-to-noise ratio (SNR) that triggers transcription":"Отношение сигнал/шум (SNR), при котором начинается распознавание",
+"Transcription squelch hang time":"Время удержания шумоподавителя распознавания",
+"Time transcription keeps going after signal disappears":"Время, в течение которого распознавание продолжается после пропадания сигнала",
+"Aircraft messages":"Сообщения воздушных судов","ADSB and UAT reports expiration time":"Время устаревания сообщений ADSB и UAT",
+"HFDL reports expiration time":"Время устаревания сообщений HFDL","VDL2 reports expiration time":"Время устаревания сообщений VDL2",
+"Filter out VDL2 acknowledgement messages":"Отфильтровывать подтверждающие сообщения VDL2",
+"ACARS reports expiration time":"Время устаревания сообщений ACARS",
+"Filter out ACARS acknowledgement messages":"Отфильтровывать подтверждающие сообщения ACARS",
+"LoRa messages":"Сообщения LoRa","LoRa WAN bandwidth":"Полоса пропускания LoRaWAN",
+"Meshtastic bandwidth":"Полоса пропускания Meshtastic","MeshCore bandwidth":"Полоса пропускания MeshCore","MeshCom bandwidth":"Полоса пропускания MeshCom",
+"7.8kbps":"7,8 кбит/с","10.4kbps":"10,4 кбит/с","15.6kbps":"15,6 кбит/с","20.8kbps":"20,8 кбит/с","31.25kbps":"31,25 кбит/с",
+"41.7kbps":"41,7 кбит/с","62.5kbps (very-long-slow)":"62,5 кбит/с (очень медленный, дальний)",
+"125kbps (medium-slow, long-moderate, long-slow)":"125 кбит/с (средне-медленный, дально-умеренный, дально-медленный)",
+"250kbps (short-slow, medium-fast, long-fast)":"250 кбит/с (ближне-медленный, средне-быстрый, дально-быстрый)",
+"500kbps (short-fast)":"500 кбит/с (ближне-быстрый)",
+"Paging messages":"Пейджинговые сообщения","Message character set":"Кодировка сообщений",
+"English (USA)":"Английский (США)","French":"Французский","German":"Немецкий","Swedish":"Шведский","Slovenian":"Словенский",
+"Filter out empty, numeric, or unreadable pager messages":"Отфильтровывать пустые, числовые или нечитаемые пейджинговые сообщения",
+"Fax transmissions":"Факсимильные передачи","Transmission speed":"Скорость передачи","lpm":"строк/мин",
+"Minimum page length":"Минимальная длина страницы","lines":"строк","Maximum page length":"Максимальная длина страницы",
+"Post-process received images to reduce noise":"Постобработка принятых изображений для снижения шума",
+"Receive color images":"Принимать цветные изображения","Use amplitude modulation":"Использовать амплитудную модуляцию",
+"Image compression":"Сжатие изображений","Compress final images to reduce space.":"Сжимать итоговые изображения для экономии места.",
+"PNG compression level":"Уровень сжатия PNG",
+"(0) No compression - fastest processing, largest file size.":"(0) Без сжатия — самая быстрая обработка, самый большой размер файла.",
+"(1) Minimal compression - very fast, slightly smaller file.":"(1) Минимальное сжатие — очень быстро, немного меньший файл.",
+"(2) Low compression - fast, some size reduction.":"(2) Слабое сжатие — быстро, небольшое уменьшение размера.",
+"(3) Moderate compression - decent balance between speed and size.":"(3) Умеренное сжатие — неплохой баланс скорости и размера.",
+"(4) Medium compression - starts to noticeably reduce file size.":"(4) Среднее сжатие — начинает заметно уменьшать размер файла.",
+"(5) Balanced compression - reasonable file size and performance.":"(5) Сбалансированное сжатие — разумный размер файла и производительность.",
+"(6) Good compression - slower than default, better file size.":"(6) Хорошее сжатие — медленнее обычного, меньший размер файла.",
+"(7) High compression - much smaller files, slower to encode.":"(7) Сильное сжатие — намного меньшие файлы, медленнее кодирование.",
+"(8) Very high compression - slow, excellent file reduction.":"(8) Очень сильное сжатие — медленно, отличное уменьшение размера.",
+"(9) Maximum compression - smallest file size, slowest processing.":"(9) Максимальное сжатие — наименьший размер файла, самая медленная обработка.",
+"PNG compression filter":"Фильтр сжатия PNG",
+"(0) None - no filtering, best for images with low entropy.":"(0) Нет — без фильтрации, лучше для изображений с низкой энтропией.",
+"(1) Sub - filters based on differences with the left pixel.":"(1) Sub — фильтрация по разнице с левым пикселем.",
+"(2) Up - filters based on differences with the pixel above.":"(2) Up — фильтрация по разнице с верхним пикселем.",
+"(3) Average - average of left and above pixels, good general-purpose.":"(3) Average — среднее левого и верхнего пикселей, хорош для общего применения.",
+"(4) Paeth - predicts using a linear function of surrounding pixels.":"(4) Paeth — предсказание линейной функцией по соседним пикселям.",
+"(5) Adaptive - automatically chooses best filter per row (default in many tools).":"(5) Adaptive — автоматически выбирает лучший фильтр для каждой строки (используется по умолчанию во многих программах).",
+"Quantize final PNG images to reduce space.":"Квантовать итоговые изображения PNG для экономии места.",
+"Palette colors":"Цвета палитры",
+"(256) High fidelity - minimal loss, large file, best for preserving detail.":"(256) Высокая точность — минимальные потери, большой файл, лучше всего сохраняет детали.",
+"(128) Good quality - near-original appearance, moderate file size.":"(128) Хорошее качество — вид, близкий к оригиналу, умеренный размер файла.",
+"(64) Balanced - visually similar to original, noticeable size savings.":"(64) Сбалансировано — визуально похоже на оригинал, заметная экономия размера.",
+"(32) Compact - some loss of gradients, still decent quality.":"(32) Компактно — некоторая потеря градиентов, всё ещё приемлемое качество.",
+"(16) Low color - significant artifacts, big file reduction.":"(16) Мало цветов — значительные артефакты, сильное уменьшение файла.",
+"(8) Very low - posterized look, very small file size.":"(8) Очень мало — постеризованный вид, очень маленький файл.",
+"(4) Stylized - extreme quantization, strong visible artifacts.":"(4) Стилизовано — экстремальное квантование, сильные видимые артефакты.",
+"WSJT decoders":"Декодеры WSJT","Number of decoding workers":"Число потоков декодирования",
+"Maximum length of decoding job queue":"Максимальная длина очереди задач декодирования",
+"Default WSJT decoding depth":"Глубина декодирования WSJT по умолчанию",
+"A higher decoding depth will allow more results, but will also consume more cpu":"Большая глубина декодирования даёт больше результатов, но потребляет больше ресурсов процессора",
+"Individual decoding depths":"Индивидуальная глубина декодирования","Js8Call decoding depth":"Глубина декодирования Js8Call",
+"Js8Call enabled modes":"Включённые режимы Js8Call",
+"Normal (15s, 50Hz, ~16WPM)":"Обычный (15с, 50Гц, ~16 слов/мин)","Slow (30s, 25Hz, ~8WPM":"Медленный (30с, 25Гц, ~8 слов/мин)",
+"Fast (10s, 80Hz, ~24WPM":"Быстрый (10с, 80Гц, ~24 слова/мин)","Turbo (6s, 160Hz, ~40WPM":"Турбо (6с, 160Гц, ~40 слов/мин)",
+"Enabled FST4 intervals":"Включённые интервалы FST4","Enabled FST4W intervals":"Включённые интервалы FST4W",
+"Enabled Q65 Mode combinations":"Включённые комбинации режима Q65",
+"Spotting and reporting":"Спотинг и отчётность","APRS-IS settings":"Настройки APRS-IS",
+"Enable sending APRS data to APRS-IS":"Включить отправку данных APRS в APRS-IS","APRS callsign":"Позывной APRS",
+"This callsign will be used to send data to the APRS-IS network":"Этот позывной будет использоваться для отправки данных в сеть APRS-IS",
+"APRS-IS server":"Сервер APRS-IS","APRS-IS network password":"Пароль сети APRS-IS",
+"Use Direwolf for APRS-IS reporting":"Использовать Direwolf для отчётности APRS-IS",
+"Use Direwolf reporter rather than native implementation, single background decoder only":"Использовать репортер Direwolf вместо встроенной реализации, только с одним фоновым декодером",
+"Send the receiver position to the APRS-IS network":"Отправлять местоположение приёмника в сеть APRS-IS",
+"Please check that your receiver location is setup correctly before enabling the beacon":"Перед включением маяка убедитесь, что местоположение приёмника настроено правильно",
+"APRS beacon symbol":"Символ маяка APRS","APRS beacon text":"Текст маяка APRS",
+"This text will be sent as APRS comment along with your beacon":"Этот текст будет отправлен как комментарий APRS вместе с вашим маяком",
+"Antenna height":"Высота антенны","Antenna height above average terrain (HAAT)":"Высота антенны над средним уровнем местности (HAAT)",
+"m":"м","Antenna gain":"Усиление антенны","dBi":"дБи","Antenna direction":"Направление антенны",
+"PSKReporter settings":"Настройки PSKReporter","Enable sending spots to pskreporter.info":"Включить отправку спотов на pskreporter.info",
+"pskreporter callsign":"Позывной pskreporter","This callsign will be used to send spots to pskreporter.info":"Этот позывной будет использоваться для отправки спотов на pskreporter.info",
+"Antenna information":"Информация об антенне","Antenna description to be sent along with spots to pskreporter":"Описание антенны, отправляемое вместе со спотами на pskreporter",
+"Rig information":"Информация о трансивере","SDR description to be sent along with spots to pskreporter":"Описание SDR, отправляемое вместе со спотами на pskreporter",
+"WSPRnet settings":"Настройки WSPRnet","Enable sending spots to wsprnet.org":"Включить отправку спотов на wsprnet.org",
+"wsprnet callsign":"Позывной wsprnet","This callsign will be used to send spots to wsprnet.org":"Этот позывной будет использоваться для отправки спотов на wsprnet.org",
+"Sondehub settings":"Настройки Sondehub","Enable Sondehub telemetry and listener reporting":"Включить телеметрию Sondehub и отчёты слушателя",
+"Uploads decoded radiosonde telemetry and keeps your listener station position on Sondehub up to date.":"Загружает декодированную телеметрию радиозондов и поддерживает актуальность позиции вашей станции на Sondehub.",
+"Uploader callsign":"Позывной для загрузки",
+"Optional override for the Sondehub uploader callsign. When left empty, OpenWebRX falls back to APRS, PSKReporter, WSPRNet callsigns, or receiver name.":"Необязательное переопределение позывного для загрузки в Sondehub. Если оставить пустым, OpenWebRX использует позывной APRS, PSKReporter, WSPRNet или имя приёмника.",
+"Antenna description sent to Sondehub with listener position updates.":"Описание антенны, отправляемое в Sondehub вместе с обновлениями позиции слушателя.",
+"AIS reporter settings":"Настройки AIS-репортера","Enable sending AIS data to VesselFinder":"Включить отправку данных AIS в VesselFinder",
+"AIS UDP host(s)":"Хост(ы) UDP для AIS","Comma separated list of AIS receiver hostnames.":"Список имён хостов приёмников AIS через запятую.",
+"AIS UDP port(s)":"Порт(ы) UDP для AIS","Comma separated list of AIS receiver UDP ports":"Список UDP-портов приёмников AIS через запятую",
+"MQTT settings":"Настройки MQTT","Enable publishing reports to MQTT":"Включить публикацию отчётов в MQTT",
+"Report clients connecting to the server (disable for public MQTT brokers!)":"Сообщать о клиентах, подключающихся к серверу (отключите для публичных MQTT-брокеров!)",
+"Report server startup and SDR profile changes (disable for public MQTT brokers!)":"Сообщать о запуске сервера и смене профиля SDR (отключите для публичных MQTT-брокеров!)",
+"Broker address":"Адрес брокера","Address of the MQTT broker to send reports to (address[:port])":"Адрес MQTT-брокера, на который отправляются отчёты (адрес[:порт])",
+"Client ID":"Идентификатор клиента","Username":"Имя пользователя","Password":"Пароль","Use SSL":"Использовать SSL",
+"MQTT topic":"Тема MQTT","MQTT topic to publish reports to (default: openwebrx)":"Тема MQTT для публикации отчётов (по умолчанию: openwebrx)",
+"Receive chat messages over MQTT":"Получать сообщения чата через MQTT","Receive aircraft data over MQTT":"Получать данные о воздушных судах через MQTT",
+"Receive marine data over MQTT":"Получать морские данные через MQTT","Receive APRS reports over MQTT":"Получать отчёты APRS через MQTT",
+"Receive WSJT decodes over MQTT":"Получать декодирования WSJT через MQTT","Receive radiosonde reports over MQTT":"Получать отчёты радиозондов через MQTT",
+"Receive Meshtastic reports over MQTT":"Получать отчёты Meshtastic через MQTT",
+"RigControl settings":"Настройки RigControl","Enable sending changes to a standalone transceiver":"Включить отправку изменений на отдельный трансивер",
+"Transceiver model":"Модель трансивера","Transceiver CAT device":"Устройство CAT трансивера",
+"Device or IP address:port used to control transceiver":"Устройство или IP-адрес:порт для управления трансивером",
+"Transceiver CI-V address":"Адрес CI-V трансивера","Optional transceiver CI-V address (used by Icom)":"Необязательный адрес CI-V трансивера (используется Icom)",
+"SDR device settings":"Настройки SDR-устройства","Unknown":"Неизвестно","profile(s)":"профиль(ей)",
+"Current profile:":"Текущий профиль:","Clients:":"Клиенты:","Connections:":"Подключения:",
+"Disabled":"Отключено","Failed":"Ошибка","[Unnamed device]":"[Устройство без имени]","State:":"Состояние:",
+"Add new device...":"Добавить новое устройство...","New profile":"Новый профиль","[Unnamed profile]":"[Профиль без имени]",
+"Please confirm":"Подтвердите действие","Close":"Закрыть",
+"Do you really want to delete this {object_type}?":"Вы действительно хотите удалить этот объект: {object_type}?",
+"Cancel":"Отмена","Delete":"Удалить","SDR device":"SDR-устройство","Remove device...":"Удалить устройство...",
+"profile":"профиль","Recent device log messages":"Последние сообщения журнала устройства",
+"New device":"Новое устройство","New device settings":"Настройки нового устройства",
+"Device name":"Название устройства","Device type":"Тип устройства",
+"Move up":"Переместить вверх","Move down":"Переместить вниз","Clone":"Клонировать","Remove profile...":"Удалить профиль...",
+"WiFi Settings":"Настройки Wi-Fi","Self-Hosted Access Point":"Собственная точка доступа",
+"Enable access point (192.168.10.1)":"Включить точку доступа (192.168.10.1)","SSID":"SSID",
+"Connection 1":"Подключение 1","Enable this connection":"Включить это подключение",
+"Connection 2":"Подключение 2","Connection 3":"Подключение 3","Connection 4":"Подключение 4",
+"Background decoding":"Фоновое декодирование","Enable background decoding services":"Включить службы фонового декодирования",
+"Enabled services":"Включённые службы","Field is required":"Поле обязательно для заполнения",
+"Value must be between {min} and {max}":"Значение должно быть между {min} и {max}",
+"Value is outside of the allowed range(s) {}":"Значение выходит за пределы допустимого диапазона(ов) {}",
+"Value contains too many colons":"Значение содержит слишком много двоеточий",
+"Port number must be numeric":"Номер порта должен быть числовым","Port number out of range":"Номер порта вне диапазона",
+"WiFi SSID must have length of 1..32 characters":"Длина SSID Wi-Fi должна быть от 1 до 32 символов",
+"WiFi SSID cannot contain '{0}' character":"SSID Wi-Fi не может содержать символ «{0}»",
+"WiFi password must have length of 8..63 characters":"Длина пароля Wi-Fi должна быть от 8 до 63 символов",
+"WiFi password is limited to printable characters":"Пароль Wi-Fi может содержать только печатные символы",
+"Invalid value. Please, check and fix!":"Недопустимое значение. Проверьте и исправьте!",
+"Additional optional settings":"Дополнительные необязательные настройки","Add":"Добавить","Remove":"Удалить",
+"Latitude out of range (-90 to 90)":"Широта вне диапазона (от -90 до 90)","Longitude out of range (-180 to 180)":"Долгота вне диапазона (от -180 до 180)",
+"Remote IP and Port":"Удалённый IP и порт","Remote hostname or IP and port to connect to. Format = IP:Port":"Удалённое имя хоста или IP и порт для подключения. Формат = IP:Port",
+"Enable Bias-Tee power supply":"Включить питание Bias-Tee","Direct Sampling":"Прямая дискретизация","Off":"Выключено",
+"Direct Sampling (I branch)":"Прямая дискретизация (ветвь I)","Direct Sampling (Q branch)":"Прямая дискретизация (ветвь Q)",
+"Enable hardware AGC":"Включить аппаратную АРУ","Specify manual gain":"Указать усиление вручную",
+"Specify gain stages individually":"Указать усиление по каскадам отдельно","Manual device gain":"Ручное усиление устройства",
+"Static scheduler":"Статический планировщик","Daylight scheduler":"Планировщик по световому дню",
+"Day":"День","Greyline":"Серая линия","Add...":"Добавить...","Minimum":"Минимум","Maximum":"Максимум",
+"Lower":"Нижний","Upper":"Верхний","dBFS":"дБFS","Upload new image...":"Загрузить новое изображение...",
+"Restore original image":"Восстановить исходное изображение",
+"General settings":"Общие настройки","SDR devices and profiles":"SDR-устройства и профили",
+"WiFi setup":"Настройка Wi-Fi","Feature report":"Отчёт о возможностях",
+"Clients":"Клиенты","Message to broadcast to all clients":"Сообщение для рассылки всем клиентам",
+"send":"отправить","Services":"Службы"
+};
+
+var R={};
+for (var k in D) R[D[k]] = k;
+var RS={};
+for (var k2 in SD) RS[SD[k2]] = k2;
+
+var P = narrow ? [
+["Audio buffer [","Буфер ["],
+["Audio output [","Вывод ["],
+["Audio stream [","Поток ["],
+["Network usage [","Сеть ["],
+["Server CPU [","ЦП ["],
+["Clients [","Слуш. ["],
+["Battery [","Бат. ["]
+] : [
+["Audio buffer [","Буфер звука ["],
+["Audio output [","Вывод звука ["],
+["Audio stream [","Аудиопоток ["],
+["Network usage [","Сеть ["],
+["Server CPU [","ЦП сервера ["],
+["Clients [","Слушатели ["],
+["Battery [","Батарея ["]
+];
+var PR = P.map(function(p){ return [p[1], p[0]]; });
+
+var lang = localStorage.getItem('ru-lang') || 'ru';
+var curDict, curPrefix;
+var fwdDict = isSettingsPage ? SD : D;
+var revDict = isSettingsPage ? RS : R;
+var fwdPrefix = isSettingsPage ? [] : P;
+var revPrefix = isSettingsPage ? [] : PR;
+
+function setDicts(){
+  if (lang === 'ru'){ curDict = fwdDict; curPrefix = fwdPrefix; }
+  else { curDict = revDict; curPrefix = revPrefix; }
+}
+setDicts();
+
+function sub(t){
+  var m=t.match(/^([\s ▲▼▾▴]*)(.*?)([\s ]*)$/);
+  if(!m)return null;
+  var k=m[2];
+  return curDict[k]?m[1]+curDict[k]+m[3]:null;
+}
+function pre(n){
+  var t=n.nodeValue;
+  for(var i=0;i<curPrefix.length;i++){
+    if(t.indexOf(curPrefix[i][0])===0){n.nodeValue=curPrefix[i][1]+t.slice(curPrefix[i][0].length);return true}
+  }
+  return false;
+}
+function txt(n){
+  if(pre(n))return;
+  var r=sub(n.nodeValue);
+  if(r!==null)n.nodeValue=r;
+}
+function attrs(e){
+  if(!e.getAttribute)return;
+  var a=["title","placeholder","alt"];
+  for(var i=0;i<a.length;i++){
+    var v=e.getAttribute(a[i]);
+    if(v&&curDict[v])e.setAttribute(a[i],curDict[v]);
+  }
+}
+function walk(r){
+  if(r.nodeType===3){txt(r);return}
+  if(r.nodeType!==1)return;
+  if(r.id==="rp-btn"||r.id==="rp-mod"||r.id==="vt-panel"||r.id==="wu-panel"||r.id==="ru-lang-btn")return;
+  if(r.closest&&(r.closest("#rp-mod")||r.closest("#vt-panel")||r.closest("#wu-panel")))return;
+  attrs(r);
+  var w=document.createTreeWalker(r,NodeFilter.SHOW_TEXT,null,false),n;
+  while(n=w.nextNode())txt(n);
+  var e=r.querySelectorAll("[title],[placeholder],[alt]");
+  for(var i=0;i<e.length;i++)attrs(e[i]);
+}
+function run(){
+  walk(document.body);
+}
+
+var observer = new MutationObserver(function(ms){
+  for(var i=0;i<ms.length;i++){
+    var m=ms[i];
+    for(var j=0;j<m.addedNodes.length;j++)walk(m.addedNodes[j]);
+    if(m.type==="characterData")txt(m.target);
+  }
+});
+
+function startObserving(){
+  observer.observe(document.body,{childList:true,subtree:true,characterData:true});
+}
+
+function makeButton(){
+  var btn = document.createElement('button');
+  btn.id = 'ru-lang-btn';
+  btn.type = 'button';
+  document.body.appendChild(btn);
+  function refreshLabel(){ btn.textContent = lang === 'ru' ? 'EN' : 'RU'; }
+  refreshLabel();
+  btn.onclick = function(){
+    lang = lang === 'ru' ? 'en' : 'ru';
+    localStorage.setItem('ru-lang', lang);
+    setDicts();
+    observer.disconnect();
+    run();
+    startObserving();
+    refreshLabel();
+  };
+}
+
+function init(){
+  run();
+  startObserving();
+  makeButton();
+}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
+})();
+
+// Блок 2: Кнопка отправки отчета о проблеме
+if (!isSettingsPage && cfg.reportEnabled && cfg.reportWebhookUrl) (function(){
+
+var URL_HOOK = cfg.reportWebhookUrl;
+
+var OPTS = [
+  ["freeze",   "Зависает, картинка замерла"],
+  ["nostream", "Не идёт поток"],
+  ["noaudio",  "Нет звука"],
+  ["slow",     "Тормозит, рвётся"],
+  ["other",    "Другое"]
+];
+
+function el(tag, props){
+  var e = document.createElement(tag);
+  for (var k in props) e[k] = props[k];
+  return e;
+}
+
+function init(){
+  if (document.getElementById('rp-btn')) return;
+
+  var btn = el('button', {id:'rp-btn', innerHTML:'&#9888;', title:'Сообщить о проблеме'});
+  document.body.appendChild(btn);
+
+  var mod = el('div', {id:'rp-mod'});
+  var box = el('div', {id:'rp-box'});
+  box.appendChild(el('b', {textContent:'Что не работает?'}));
+
+  for (var i = 0; i < OPTS.length; i++){
+    var lab = el('label');
+    var inp = el('input', {type:'radio', name:'rp-r', value:OPTS[i][0]});
+    if (i === 0) inp.checked = true;
+    lab.appendChild(inp);
+    lab.appendChild(document.createTextNode(' ' + OPTS[i][1]));
+    box.appendChild(lab);
+  }
+
+  var ta = el('textarea', {id:'rp-c', rows:2, maxLength:300, placeholder:'Комментарий'});
+  box.appendChild(ta);
+
+  var row = el('div', {className:'row'});
+  var cancel = el('button', {id:'rp-cancel', textContent:'Отмена'});
+  var send = el('button', {id:'rp-send', textContent:'Отправить'});
+  row.appendChild(cancel);
+  row.appendChild(send);
+  box.appendChild(row);
+
+  var msg = el('div', {id:'rp-msg'});
+  box.appendChild(msg);
+  mod.appendChild(box);
+  document.body.appendChild(mod);
+
+  function getFreq(){
+    try {
+      if (window.center_freq) return (window.center_freq/1e6).toFixed(3) + ' MHz';
+      var e = document.querySelector('#openwebrx-panel-receiver .frequency');
+      return e ? e.textContent.trim() : '';
+    } catch(e){ return ''; }
+  }
+
+  function getProfile(){
+    var s = document.getElementById('openwebrx-sdr-profiles-listbox');
+    return (s && s.options[s.selectedIndex]) ? s.options[s.selectedIndex].text : '';
+  }
+
+  function close(){
+    mod.style.display = 'none';
+    msg.textContent = '';
+  }
+
+  btn.onclick = function(){ mod.style.display = 'block'; };
+  mod.onclick = function(e){ if (e.target === mod) close(); };
+  cancel.onclick = close;
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape' && mod.style.display === 'block') close();
+  });
+
+  send.onclick = function(){
+    var last = parseInt(sessionStorage.getItem('rp-sent') || '0', 10);
+    if (Date.now() - last < 60000){
+      msg.textContent = 'Подождите минуту перед повтором';
+      return;
+    }
+
+    send.disabled = true;
+    msg.textContent = 'Отправка...';
+
+    var payload = {
+      reason: document.querySelector('input[name=rp-r]:checked').value,
+      comment: ta.value,
+      freq: getFreq(),
+      profile: getProfile(),
+      ua: navigator.userAgent,
+      page: location.href
+    };
+
+    fetch(URL_HOOK, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(payload)
+    })
+      .then(function(r){ return r.json().catch(function(){ return {ok:r.ok}; }); })
+      .then(function(j){
+        if (j && j.ok){
+          sessionStorage.setItem('rp-sent', String(Date.now()));
+          msg.textContent = 'Спасибо, отправлено!';
+          ta.value = '';
+          setTimeout(close, 1500);
+        } else {
+          msg.textContent = 'Ошибка отправки';
+        }
+      })
+      .catch(function(){ msg.textContent = 'Не удалось отправить'; })
+      .finally(function(){ send.disabled = false; });
+  };
+}
+if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+else init();
+})();
+
+// Блок 3: Система голосования
+if (!isSettingsPage && cfg.voteEnabled && cfg.voteWebhookUrl) (function(){
+
+var URL_VOTE = cfg.voteWebhookUrl;
+var PREFIX = '##v|';
+var FAST = 3000;
+var IDLE = 25000;
+
+var cid = Math.random().toString(36).slice(2, 10);
+var isAdmin = false;
+var bypass = false;
+var prevValue = null;
+var myVote = null;
+var myAnswer = null;
+var shownReq = null;
+var shownRes = null;
+var subEl = null;
+var mineEl = null;
+var timerLeft = 0;
+var counts = null;
+var lastPoll = 0;
+
+fetch('/settings', {method:'GET', redirect:'follow'})
+  .then(function(r){ isAdmin = r.ok && r.url.indexOf('login') < 0; })
+  .catch(function(){ isAdmin = false; });
+
+function log(){
+  if (window.VT_DEBUG) console.log.apply(console, ['[vote]'].concat([].slice.call(arguments)));
+}
+
+function tone(ctx, freq, delay, dur, vol){
+  var osc = ctx.createOscillator();
+  var gain = ctx.createGain();
+  osc.type = 'sine';
+  osc.frequency.value = freq;
+  var t0 = ctx.currentTime + delay;
+  gain.gain.setValueAtTime(0.0001, t0);
+  gain.gain.exponentialRampToValueAtTime(vol, t0 + 0.02);
+  gain.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  osc.start(t0);
+  osc.stop(t0 + dur + 0.02);
+}
+
+function beep(kind){
+  try {
+    var Ctx = window.AudioContext || window.webkitAudioContext;
+    if (!Ctx) return;
+    var ctx = new Ctx();
+    var pairs = kind === 'ok' ? [[660, 0, 0.12], [990, 0.13, 0.18]]
+              : kind === 'no' ? [[440, 0, 0.14], [330, 0.15, 0.22]]
+              :                 [[880, 0, 0.16], [880, 0.22, 0.16]];
+    pairs.forEach(function(p){ tone(ctx, p[0], p[1], p[2], 0.22); });
+    setTimeout(function(){ try { ctx.close(); } catch(e){} }, 900);
+  } catch(e){ log('beep failed', e); }
+}
+
+function api(payload){
+  payload.cid = cid;
+  lastPoll = Date.now();
+  return fetch(URL_VOTE, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(payload)
+  }).then(function(r){ return r.json(); });
+}
+
+function ping(){
+  try {
+    if (typeof Chat !== 'undefined' && Chat.sendMessage){
+      if (!Chat.nickname) Chat.setNickname('sdr-' + cid);
+      Chat.sendMessage(PREFIX + 'go|' + cid, Chat.nickname || ('sdr-' + cid));
+    }
+  } catch(e){ log('ping failed', e); }
+}
+
+function listeners(){
+  var bars = document.querySelectorAll('.openwebrx-progressbar, .openwebrx-progressbar-text');
+  for (var i = 0; i < bars.length; i++){
+    var m = bars[i].textContent.match(/(?:Clients|Слушатели|Слуш\.)\s*\[\s*(\d+)/);
+    if (m) return parseInt(m[1], 10);
+  }
+  return 1;
+}
+
+function panel(){
+  var d = document.getElementById('vt-panel');
+  if (d) return d;
+  d = document.createElement('div');
+  d.id = 'vt-panel';
+  document.body.appendChild(d);
+  return d;
+}
+
+function hide(){
+  panel().style.display = 'none';
+  subEl = null;
+  mineEl = null;
+}
+
+function notice(text, ms){
+  var box = panel();
+  box.innerHTML = '';
+  box.textContent = text;
+  box.style.display = 'block';
+  subEl = null;
+  mineEl = null;
+  setTimeout(function(){ if (!myVote && !shownReq) hide(); }, ms || 3000);
+}
+
+function refreshSub(){
+  if (!subEl) return;
+  var s = 'Осталось ' + timerLeft + ' с';
+  if (counts) s += ' · за ' + counts.yes + ', против ' + counts.no + ' из ' + counts.seen;
+  subEl.textContent = s;
+  if (mineEl) {
+    mineEl.textContent = myAnswer === null ? ''
+      : ('Ваш голос: ' + (myAnswer ? 'не возражаю' : 'возражаю'));
+  }
+}
+
+function show(title, withButtons, seconds){
+  var box = panel();
+  box.innerHTML = '';
+
+  var t = document.createElement('div');
+  t.textContent = title;
+  box.appendChild(t);
+
+  subEl = document.createElement('div');
+  subEl.className = 'vt-sub';
+  box.appendChild(subEl);
+
+  timerLeft = seconds;
+
+  var iv = setInterval(function(){
+    timerLeft--;
+    if (timerLeft < 0) timerLeft = 0;
+    refreshSub();
+  }, 1000);
+
+  var handle = {
+    stop: function(){ clearInterval(iv); hide(); },
+    freeze: function(){
+      var row = box.querySelector('.vt-row');
+      if (row) row.remove();
+    }
+  };
+
+  if (withButtons){
+    var row = document.createElement('div');
+    row.className = 'vt-row';
+    var yes = document.createElement('button');
+    yes.id = 'vt-yes';
+    yes.textContent = 'Не возражаю';
+    var no = document.createElement('button');
+    no.id = 'vt-no';
+    no.textContent = 'Возражаю';
+    yes.onclick = function(){ handle.onYes && handle.onYes(); };
+    no.onclick  = function(){ handle.onNo && handle.onNo(); };
+    row.appendChild(yes);
+    row.appendChild(no);
+    box.appendChild(row);
+  }
+
+  mineEl = document.createElement('div');
+  mineEl.className = 'vt-mine';
+  box.appendChild(mineEl);
+
+  refreshSub();
+  box.style.display = 'block';
+  return handle;
+}
+
+function applySwitch(value){
+  var sel = document.getElementById('openwebrx-sdr-profiles-listbox');
+  if (!sel) return;
+  bypass = true;
+  sel.value = value;
+  sel.dispatchEvent(new Event('change', {bubbles: true}));
+  prevValue = value;
+}
+
+function describe(r){
+  var d = 'за ' + r.yes + ', против ' + r.no;
+  if (r.silent > 0) d += ' (промолчали ' + r.silent + ')';
+  return d;
+}
+
+function poll(){
+  api({action: 'poll'}).then(function(s){
+    if (s.pending){
+      counts = {yes: s.pending.yes, no: s.pending.no, seen: s.pending.seen};
+      timerLeft = s.pending.left;
+      refreshSub();
+
+      if (s.pending.by !== cid && shownReq !== s.pending.id){
+        shownReq = s.pending.id;
+        myAnswer = null;
+        beep('ask');
+        var id = s.pending.id;
+        var w = show('Кто-то хочет переключить на «' + s.pending.profile + '»',
+                     true, s.pending.left);
+        w.onYes = function(){
+          myAnswer = true;
+          w.freeze();
+          refreshSub();
+          api({action:'vote', id: id, ok: true}).then(function(){ ping(); poll(); });
+        };
+        w.onNo = function(){
+          myAnswer = false;
+          w.freeze();
+          refreshSub();
+          api({action:'vote', id: id, ok: false}).then(function(){ ping(); poll(); });
+        };
+      }
+    } else {
+      counts = null;
+    }
+
+    if (s.last && shownRes !== s.last.id){
+      shownRes = s.last.id;
+      log('результат', s.last);
+
+      if (myVote === s.last.id){
+        myVote = null;
+        beep(s.last.ok ? 'ok' : 'no');
+        if (s.last.ok){
+          applySwitch(s.last.want);
+          notice('Переключаю: ' + describe(s.last), 3000);
+        } else {
+          notice('Переключение отклонено: ' + describe(s.last), 5000);
+        }
+      } else if (s.last.by !== cid){
+        shownReq = null;
+        myAnswer = null;
+        beep(s.last.ok ? 'ok' : 'no');
+        notice((s.last.ok ? 'Переключение согласовано: ' : 'Переключение отклонено: ')
+               + describe(s.last), 4000);
+      }
+    }
+  }).catch(function(e){ log('poll failed', e); });
+}
+
+function hookChat(){
+  if (typeof Chat === 'undefined' || !Chat.recvMessage || Chat.__vtHooked) return;
+  Chat.__vtHooked = true;
+  var origRecv = Chat.recvMessage.bind(Chat);
+  Chat.recvMessage = function(nickname, text, color){
+    if (typeof text === 'string' && text.indexOf(PREFIX) === 0){
+      var from = text.slice(PREFIX.length).split('|')[1];
+      log('получен сигнал от', from);
+      if (from !== cid) poll();
+      return;
+    }
+    return origRecv(nickname, text, color);
+  };
+  log('чат перехвачен');
+}
+
+function hookSelect(){
+  var sel = document.getElementById('openwebrx-sdr-profiles-listbox');
+  if (!sel || sel.dataset.vtHooked) return;
+  sel.dataset.vtHooked = '1';
+  prevValue = sel.value;
+
+  sel.addEventListener('change', function(e){
+    if (bypass){ bypass = false; prevValue = sel.value; return; }
+    var want = sel.value;
+    var n = listeners();
+
+    if (isAdmin || n < 2){ prevValue = want; return; }
+
+    e.preventDefault();
+    e.stopPropagation();
+    e.stopImmediatePropagation();
+    sel.value = prevValue;
+
+    if (myVote){ notice('Голосование уже идёт', 2500); return; }
+
+    var label = want;
+    for (var i = 0; i < sel.options.length; i++){
+      if (sel.options[i].value === want) label = sel.options[i].text;
+    }
+
+    api({action: 'request', profile: label, want: want}).then(function(j){
+      if (j.error){ notice(j.error, 3500); return; }
+      myVote = j.id;
+      myAnswer = null;
+      counts = {yes: 0, no: 0, seen: 0};
+      ping();
+      show('Спрашиваю остальных слушателей...', false, j.left);
+    }).catch(function(){
+      notice('Не удалось начать голосование', 3000);
+    });
+  }, true);
+}
+
+setInterval(function(){
+  hookSelect();
+  hookChat();
+  if (document.hidden) return;
+  var active = myVote || shownReq;
+  var gap = active ? FAST : IDLE;
+  if (Date.now() - lastPoll >= gap) poll();
+}, 1000);
+
+hookSelect();
+hookChat();
+poll();
+})();
+
+// Блок 4: Статус запуска приемника
+if (!isSettingsPage && cfg.warmupEnabled) (function(){
+
+var GRACE = 8000;
+var box = null;
+var since = Date.now();
+var lastData = 0;
+var shown = false;
+var dismissed = false;
+var hookedWs = null;
+
+function panel(){
+  if (box) return box;
+  box = document.createElement('div');
+  box.id = 'wu-panel';
+  document.body.appendChild(box);
+  return box;
+}
+
+function show(){
+  if (shown || dismissed) return;
+  shown = true;
+  var p = panel();
+  p.innerHTML = '';
+
+  var x = document.createElement('span');
+  x.className = 'wu-x';
+  x.textContent = '×';
+  x.title = 'Закрыть';
+  x.onclick = function(){ dismissed = true; hide(); };
+  p.appendChild(x);
+
+  var t = document.createElement('div');
+  t.textContent = 'Приёмник запускается, подождите';
+  p.appendChild(t);
+
+  var c = document.createElement('div');
+  c.className = 'wu-sub';
+  c.textContent = 'Обычно занимает до двух минут';
+  p.appendChild(c);
+
+  p.style.display = 'block';
+}
+
+function hide(){
+  if (!shown) return;
+  shown = false;
+  panel().style.display = 'none';
+}
+
+function onMsg(evt){
+  if (evt && evt.data && typeof evt.data !== 'string') lastData = Date.now();
+}
+
+function hookWs(){
+  var ws = window.ws;
+  if (!ws || ws === hookedWs || typeof ws.addEventListener !== 'function') return;
+  ws.addEventListener('message', onMsg);
+  hookedWs = ws;
+}
+
+function trafficFromBar(){
+  var bars = document.querySelectorAll('.openwebrx-progressbar, .openwebrx-progressbar-text');
+  for (var i = 0; i < bars.length; i++){
+    var m = bars[i].textContent.match(/(?:Network usage|Сеть)\s*\[\s*([\d.]+)/);
+    if (m && parseFloat(m[1]) > 1) return true;
+  }
+  return false;
+}
+
+setInterval(function(){
+  hookWs();
+  var flowing = (lastData && Date.now() - lastData < 4000) || trafficFromBar();
+  if (flowing){
+    hide();
+    since = Date.now();
+    return;
+  }
+  if (Date.now() - since > GRACE) show();
+}, 1000);
+})();
+
+})();
+    </script>
+    </body>
+</html>

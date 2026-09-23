@@ -1,0 +1,14 @@
+ARG ARCHTAG
+ARG PROJECT
+FROM ${PROJECT}-soapysdr-base:$ARCHTAG
+ARG MAKEFLAGS
+
+COPY docker/scripts/install-dependencies-sdrplay.sh \
+     docker/files/sdrplay/install-lib.*.patch /
+RUN /install-dependencies-sdrplay.sh &&\
+    rm /install-dependencies-sdrplay.sh &&\
+    rm /install-lib.*.patch
+
+COPY docker/files/services/sdrplay /etc/services.d/sdrplay
+
+COPY . /opt/openwebrx

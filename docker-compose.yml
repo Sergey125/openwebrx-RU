@@ -1,0 +1,20 @@
+services:
+  openwebrx:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: full
+      args:
+        MAKEFLAGS: "-j4"
+    image: openwebrxplus-custom:latest
+    container_name: openwebrx
+    restart: unless-stopped
+    ports:
+      - "8073:8073"
+    volumes:
+      - openwebrx-settings:/var/lib/openwebrx
+      - openwebrx-etc:/etc/openwebrx
+
+volumes:
+  openwebrx-settings:
+  openwebrx-etc:
